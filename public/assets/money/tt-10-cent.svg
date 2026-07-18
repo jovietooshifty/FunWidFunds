@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img">
+  <defs>
+    <radialGradient id="shine" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.12"/>
+    </radialGradient>
+  </defs>
+  <circle cx="100" cy="100" r="96" fill="#7d8890"/>
+  <circle cx="100" cy="100" r="90" fill="#9aa4ad"/>
+  <circle cx="100" cy="100" r="74" fill="#c8d0d6"/>
+  <circle cx="100" cy="100" r="74" fill="none" stroke="#7d8890" stroke-width="3" stroke-dasharray="4 6"/>
+  <text x="100" y="30" text-anchor="middle" font-family="Verdana, sans-serif" font-size="13" font-weight="bold" fill="#4a555e" letter-spacing="1">TRINIDAD</text>
+  <text x="100" y="186" text-anchor="middle" font-family="Verdana, sans-serif" font-size="13" font-weight="bold" fill="#4a555e" letter-spacing="1">&amp; TOBAGO</text>
+  <text x="100" y="118" text-anchor="middle" font-family="Verdana, sans-serif" font-size="52" font-weight="bold" fill="#4a555e">10¢</text>
+  <text x="100" y="148" text-anchor="middle" font-family="Verdana, sans-serif" font-size="16" font-weight="bold" fill="#4a555e">TEN CENTS</text>
+  <path d="M84 62 q8 -18 24 -12 q14 6 6 20 q-6 10 -22 8 q-12 -2 -8 -16z" fill="#7d8890" opacity="0.55"/>
+  <circle cx="100" cy="100" r="96" fill="url(#shine)"/>
+</svg>

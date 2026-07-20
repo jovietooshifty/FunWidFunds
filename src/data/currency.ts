@@ -79,3 +79,24 @@ export function formatMoney(value: number): string {
 export function isNote(id: string): boolean {
   return id.includes("note");
 }
+
+/**
+ * Fewest number of bills needed to make `target` using the given denomination
+ * ids. Greedy is optimal for the canonical $1/$5/$10/$20 set. Returns Infinity
+ * if the target cannot be made exactly.
+ */
+export function minBills(target: number, billIds: string[]): number {
+  const values = billIds
+    .map((id) => MONEY[id]?.value ?? 0)
+    .filter((v) => v > 0)
+    .sort((a, b) => b - a);
+  let remaining = target;
+  let count = 0;
+  for (const v of values) {
+    while (remaining >= v) {
+      remaining -= v;
+      count += 1;
+    }
+  }
+  return remaining === 0 ? count : Infinity;
+}

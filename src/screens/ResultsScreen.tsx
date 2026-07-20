@@ -162,8 +162,31 @@ export function ResultsScreen({
           {missed.map((record) => {
             const question = level.questions.find((qq) => qq.id === record.questionId);
             if (!question) return null;
-            const chosen = question.options.find((o) => o.id === record.selectedOptionId);
-            const right = question.options.find((o) => o.id === record.correctOptionId);
+
+            // Drag-to-pay questions have no pre-set options — review by amount.
+            if (question.mode) {
+              const paid = record.selectedOptionId.split(":")[1] ?? "0";
+              const needed = record.correctOptionId.split(":")[1] ?? "0";
+              return (
+                <div className="review-card" key={record.questionId}>
+                  <p className="review-prompt">{question.prompt}</p>
+                  <div className="review-answers">
+                    <div className="review-answer chosen">
+                      <span className="review-answer-label">You paid</span>
+                      <span className="option-text">${paid}</span>
+                    </div>
+                    <span className="review-arrow" aria-hidden="true">➡️</span>
+                    <div className="review-answer right">
+                      <span className="review-answer-label">Needed</span>
+                      <span className="option-text">${needed}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            const chosen = question.options?.find((o) => o.id === record.selectedOptionId);
+            const right = question.options?.find((o) => o.id === record.correctOptionId);
             return (
               <div className="review-card" key={record.questionId}>
                 {question.item ? (

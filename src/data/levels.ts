@@ -12,21 +12,18 @@ const rep = (id: string, n: number): string[] => Array.from({ length: n }, () =>
 // Helpers — one per question shape. All produce a Question.
 // ============================================================
 
-// Type 1 — Exact Match (Fruit Stand). Options are single MONEY bills.
-function q(
-  num: number,
-  itemName: string,
-  itemImage: string,
-  price: number,
-  optionIds: [string, string, string],
-  correctOptionId: string,
-): Question {
+// Bills offered in the draggable tray (a real spread, not just what's needed).
+const TRAY = [N1, N5, N10, N20];
+
+// Type 1 — Exact Match (Fruit Stand): drag bills until the total = price.
+function payQ(num: number, itemName: string, itemImage: string, price: number): Question {
   return {
     id: `level-1-question-${num}`,
-    prompt: `The ${itemName.toLowerCase()} costs $${price}. What do you pay with?`,
+    prompt: `The ${itemName.toLowerCase()} costs $${price}. Drag the money to pay!`,
     item: { name: itemName, price, image: itemImage },
-    options: optionIds.map((id) => MONEY[id]),
-    correctOptionId,
+    mode: "exact",
+    availableBills: TRAY,
+    targetValue: price,
   };
 }
 
@@ -83,26 +80,16 @@ function billsQ(
 // Level 1 — Fruit Stand (Exact Match) — unchanged
 // ============================================================
 export const levelOneQuestions: Question[] = [
-  q(1, "Apple", "/assets/items/apple.svg", 1,
-    ["tt-1-dollar-note", "tt-5-dollar-note", "tt-10-dollar-note"], "tt-1-dollar-note"),
-  q(2, "Juice", "/assets/items/juice.svg", 5,
-    ["tt-1-dollar-note", "tt-5-dollar-note", "tt-20-dollar-note"], "tt-5-dollar-note"),
-  q(3, "Orange", "/assets/items/orange.svg", 1,
-    ["tt-10-dollar-note", "tt-1-dollar-note", "tt-5-dollar-note"], "tt-1-dollar-note"),
-  q(4, "Mango", "/assets/items/mango.svg", 5,
-    ["tt-5-dollar-note", "tt-10-dollar-note", "tt-1-dollar-note"], "tt-5-dollar-note"),
-  q(5, "Pear", "/assets/items/pear.svg", 1,
-    ["tt-20-dollar-note", "tt-1-dollar-note", "tt-10-dollar-note"], "tt-1-dollar-note"),
-  q(6, "Pineapple", "/assets/items/pineapple.svg", 10,
-    ["tt-10-dollar-note", "tt-20-dollar-note", "tt-5-dollar-note"], "tt-10-dollar-note"),
-  q(7, "Coconut", "/assets/items/coconut.svg", 10,
-    ["tt-1-dollar-note", "tt-10-dollar-note", "tt-20-dollar-note"], "tt-10-dollar-note"),
-  q(8, "Banana", "/assets/items/banana.svg", 1,
-    ["tt-5-dollar-note", "tt-1-dollar-note", "tt-20-dollar-note"], "tt-1-dollar-note"),
-  q(9, "Grapes", "/assets/items/grapes.svg", 20,
-    ["tt-5-dollar-note", "tt-10-dollar-note", "tt-20-dollar-note"], "tt-20-dollar-note"),
-  q(10, "Watermelon", "/assets/items/watermelon.svg", 20,
-    ["tt-20-dollar-note", "tt-1-dollar-note", "tt-10-dollar-note"], "tt-20-dollar-note"),
+  payQ(1, "Apple", "/assets/items/apple.svg", 1),
+  payQ(2, "Juice", "/assets/items/juice.svg", 5),
+  payQ(3, "Orange", "/assets/items/orange.svg", 1),
+  payQ(4, "Mango", "/assets/items/mango.svg", 5),
+  payQ(5, "Pear", "/assets/items/pear.svg", 1),
+  payQ(6, "Pineapple", "/assets/items/pineapple.svg", 10),
+  payQ(7, "Coconut", "/assets/items/coconut.svg", 10),
+  payQ(8, "Banana", "/assets/items/banana.svg", 1),
+  payQ(9, "Grapes", "/assets/items/grapes.svg", 20),
+  payQ(10, "Watermelon", "/assets/items/watermelon.svg", 20),
 ];
 
 // ============================================================

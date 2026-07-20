@@ -612,6 +612,98 @@ button {
   margin-bottom: 4px;
 }
 
+/* ============ DRAG-TO-PAY ============ */
+
+.pay-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+/* Drop zone / payment tray */
+.payment-tray {
+  width: 100%;
+  max-width: 620px;
+  min-height: clamp(96px, 22vw, 128px);
+  border: 4px dashed var(--ocean);
+  border-radius: var(--radius);
+  background: rgba(39, 147, 209, 0.07);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+}
+
+.pay-hint {
+  color: var(--ocean);
+  font-weight: 700;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+}
+
+.dropped-bill {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.dropped-bill img {
+  height: clamp(40px, 9vw, 58px);
+  width: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 0 rgba(74, 53, 32, 0.18);
+}
+
+.pay-total {
+  font-size: clamp(1.1rem, 3.2vw, 1.5rem);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.pay-total strong {
+  color: var(--leaf);
+  font-weight: 800;
+}
+
+/* Source tray of draggable bills */
+.bill-tray {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 8px;
+  width: 100%;
+  max-width: 620px;
+  background: var(--panel);
+  border: 3px solid var(--sand);
+  border-radius: var(--radius);
+}
+
+.tray-bill {
+  height: clamp(46px, 11vw, 72px);
+  width: auto;
+  border-radius: 5px;
+  cursor: grab;
+  touch-action: none; /* let Framer Motion own the drag gesture on touch */
+  user-select: none;
+  -webkit-user-drag: none;
+  box-shadow: var(--shadow);
+}
+
+.tray-bill:active {
+  cursor: grabbing;
+}
+
+.confirm-button {
+  margin-top: 2px;
+}
+
 .money-option:not(:disabled):hover {
   border-color: var(--sunshine);
 }

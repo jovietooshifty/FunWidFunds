@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import type { AnswerRecord, Level, MoneyOption } from "../types";
-import { formatMoney } from "../data/currency";
+import { formatMoney, minBills } from "../data/currency";
+import { DragPayment, type PayResult } from "../components/DragPayment";
 import { StarBar } from "../components/StarBar";
 import { StreakBadge } from "../components/StreakBadge";
 import { BirdMascot, type MascotState } from "../components/mascot/BirdMascot";
@@ -89,19 +90,13 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
     );
   }
 
-  function handleAnswer(option: MoneyOption, event: React.MouseEvent<HTMLButtonElement>) {
-    if (phase !== "answering") return; // no duplicate submissions during feedback
-    const correct = option.id === question.correctOptionId;
-    const record: AnswerRecord = {
-      questionId: question.id,
-      selectedOptionId: option.id,
-      correctOptionId: question.correctOptionId,
-      correct,
-      starEarned: correct,
-    };
+  // Shared post-answer flow: streak, mascot, confetti, flying star, advance.
+  // `originRect` is where the confetti/star launch from (the tapped option or
+  // the Confirm button).
+  function resolveAnswer(record: AnswerRecord, originRect: DOMRect | null) {
+    const correct = record.correct;
     const nextAnswers = [...answers, record];
     setAnswers(nextAnswers);
-    setSelectedId(option.id);
     setPhase("feedback");
 
     if (correct) {
@@ -111,13 +106,12 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
       setMascotState(milestone ? "streak" : "correct");
       setMascotMessage(milestone ?? pick(SUCCESS_MESSAGES));
       sounds.correct();
-      if (!reducedMotion) {
-        const rect = event.currentTarget.getBoundingClientRect();
+      if (!reducedMotion && originRect) {
         const bar = document.getElementById("star-bar")?.getBoundingClientRect();
         if (bar) {
           setFlyingStar({
-            fromX: rect.left + rect.width / 2,
-            fromY: rect.top + rect.height / 2,
+            fromX: originRect.left + originRect.width / 2,
+            fromY: originRect.top + originRect.height / 2,
             toX: bar.left + bar.width / 2,
             toY: bar.top + bar.height / 2,
           });
@@ -127,8 +121,8 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
           spread: milestone ? 80 : 60,
           startVelocity: 28,
           origin: {
-            x: (rect.left + rect.width / 2) / window.innerWidth,
-            y: rect.top / window.innerHeight,
+            x: (originRect.left + originRect.width / 2) / window.innerWidth,
+            y: originRect.top / window.innerHeight,
           },
           disableForReducedMotion: true,
         });
@@ -155,6 +149,44 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
         }
       },
       correct ? 1700 : 2400,
+    );
+  }
+
+  // Tap model (legacy shops): pick one of the pre-set options.
+  function handleAnswer(option: MoneyOption, event: React.MouseEvent<HTMLButtonElement>) {
+    if (phase !== "answering") return;
+    const correct = option.id === question.correctOptionId;
+    setSelectedId(option.id);
+    resolveAnswer(
+      {
+        questionId: question.id,
+        selectedOptionId: option.id,
+        correctOptionId: question.correctOptionId ?? "",
+        correct,
+        starEarned: correct,
+      },
+      event.currentTarget.getBoundingClientRect(),
+    );
+  }
+
+  // Drag model: the child built an amount by dragging bills; check it here.
+  function handleConfirm(result: PayResult) {
+    if (phase !== "answering") return;
+    const target = question.targetValue ?? 0;
+    let correct = result.total === target;
+    if (question.mode === "least-bills") {
+      const fewest = minBills(target, question.availableBills ?? []);
+      correct = result.total === target && result.count === fewest;
+    }
+    resolveAnswer(
+      {
+        questionId: question.id,
+        selectedOptionId: `paid:${result.total}:${result.count}`,
+        correctOptionId: `need:${target}`,
+        correct,
+        starEarned: correct,
+      },
+      result.originRect,
     );
   }
 
@@ -228,8 +260,16 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
             )}
             <h2 className="question-prompt">{question.prompt}</h2>
 
+            {question.mode ? (
+              <DragPayment
+                key={question.id}
+                availableBills={question.availableBills ?? []}
+                disabled={phase !== "answering"}
+                onConfirm={handleConfirm}
+              />
+            ) : (
             <div className="options-row">
-              {question.options.map((option) => {
+              {(question.options ?? []).map((option) => {
                 const isSelected = selectedId === option.id;
                 const isCorrectOption = option.id === question.correctOptionId;
                 const showFeedback = phase === "feedback";
@@ -264,6 +304,7 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
                 );
               })}
             </div>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

@@ -16,12 +16,23 @@ export function SignupPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
     setLoading(true);
     try {
       await signUp(email, password, name, role);
       setSuccess(true);
     } catch (err: any) {
-      setError(err.message ?? "Could not create account. Try again!");
+      const msg: string = err?.message ?? "";
+      if (/password/i.test(msg)) {
+        setError("That password is too weak. Use at least 6 characters.");
+      } else if (/already registered|already exists/i.test(msg)) {
+        setError("That email already has an account. Try signing in!");
+      } else {
+        setError(msg || "Could not create account. Try again!");
+      }
     } finally {
       setLoading(false);
     }
@@ -88,6 +99,7 @@ export function SignupPage() {
             minLength={6}
             autoComplete="new-password"
           />
+          <span className="auth-hint">At least 6 characters</span>
         </label>
 
         <fieldset className="auth-role-picker">

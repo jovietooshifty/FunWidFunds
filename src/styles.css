@@ -1347,6 +1347,13 @@ button:focus-visible,
   font-size: 0.95rem;
 }
 
+.auth-hint {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #8b7355;
+  margin-top: 0.2rem;
+}
+
 .auth-submit {
   margin-top: 0.5rem;
 }

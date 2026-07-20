@@ -57,10 +57,12 @@ export function StudentGamePage() {
 
   // Compute unlocked levels from progress
   const levelsWithUnlock = LEVELS.map((level) => {
-    if (level.id === 1) return { ...level, unlocked: true };
+    // A level with no questions ("coming soon") is never playable.
+    const hasQuestions = level.questions.length > 0;
+    if (level.id === 1) return { ...level, unlocked: hasQuestions };
     const prevProgress = progress.find((p) => p.level_id === level.id - 1);
-    const unlocked = prevProgress ? prevProgress.stars_earned >= prevProgress.level_id : false;
-    return { ...level, unlocked: unlocked || level.unlocked };
+    const progressed = prevProgress ? prevProgress.stars_earned >= prevProgress.level_id : false;
+    return { ...level, unlocked: hasQuestions && (progressed || level.unlocked) };
   });
 
   async function handleComplete(records: AnswerRecord[]) {

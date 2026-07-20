@@ -70,6 +70,25 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
     };
   }, []);
 
+  // Defensive: a level with no questions (e.g. a "coming soon" shop) should
+  // never crash the game — show a friendly bail-out instead.
+  if (!question) {
+    return (
+      <motion.div
+        className="screen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{ textAlign: "center", padding: "3rem 1rem" }}
+      >
+        <div className="item-emoji" style={{ fontSize: 72 }}>🚧</div>
+        <h2 className="screen-title">This shop is coming soon!</h2>
+        <button type="button" className="big-button" onClick={onQuit}>
+          Back to Map 🗺️
+        </button>
+      </motion.div>
+    );
+  }
+
   function handleAnswer(option: MoneyOption, event: React.MouseEvent<HTMLButtonElement>) {
     if (phase !== "answering") return; // no duplicate submissions during feedback
     const correct = option.id === question.correctOptionId;

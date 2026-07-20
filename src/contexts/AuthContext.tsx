@@ -11,7 +11,12 @@ interface AuthState {
 }
 
 interface AuthActions {
-  signUp: (email: string, password: string, name: string, role: "parent" | "teacher") => Promise<void>;
+  signUp: (
+    email: string,
+    password: string,
+    name: string,
+    role: "parent" | "teacher"
+  ) => Promise<{ needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -57,12 +62,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string, name: string, role: "parent" | "teacher") => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name, role } },
     });
     if (error) throw error;
+    // When email confirmation is off, Supabase returns a live session and the
+    // user is already signed in; otherwise session is null until they confirm.
+    return { needsConfirmation: !data.session };
   };
 
   const signIn = async (email: string, password: string) => {

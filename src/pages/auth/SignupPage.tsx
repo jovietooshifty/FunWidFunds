@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
 
 export function SignupPage() {
   const { signUp } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,8 +23,15 @@ export function SignupPage() {
     }
     setLoading(true);
     try {
-      await signUp(email, password, name, role);
-      setSuccess(true);
+      const { needsConfirmation } = await signUp(email, password, name, role);
+      if (needsConfirmation) {
+        setSuccess(true);
+      } else {
+        // Auto-confirm is on: the user is already signed in. Send them in.
+        navigate(role === "parent" ? "/parent/dashboard" : "/teacher/dashboard", {
+          replace: true,
+        });
+      }
     } catch (err: any) {
       const msg: string = err?.message ?? "";
       if (/password/i.test(msg)) {

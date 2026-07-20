@@ -2,19 +2,21 @@ export interface MoneyOption {
   id: string;
   value: number;
   label: string;
-  image: string;
+  image?: string; // single bill/coin (exact-match, counting-source)
+  bills?: string[]; // NEW: multiple MONEY ids shown together as one option
 }
 
 export interface QuestionItem {
   name: string;
   price: number;
-  image: string;
+  image?: string; // SVG/PNG asset (fruit, coins)
+  emoji?: string; // NEW: render an emoji instead of an image asset
 }
 
 export interface Question {
   id: string;
   prompt: string;
-  item: QuestionItem;
+  item?: QuestionItem; // optional: counting/budgeting have no single item
   options: MoneyOption[];
   correctOptionId: string;
 }

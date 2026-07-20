@@ -2,7 +2,8 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import type { AnswerRecord, Character, Level } from "../types";
-import { MONEY, formatMoney } from "../data/currency";
+import { formatMoney } from "../data/currency";
+import { OptionVisual } from "../components/OptionVisual";
 import { sounds } from "../audio/sound";
 import { prefersReducedMotion } from "../motion";
 
@@ -161,28 +162,34 @@ export function ResultsScreen({
           {missed.map((record) => {
             const question = level.questions.find((qq) => qq.id === record.questionId);
             if (!question) return null;
-            const chosen = MONEY[record.selectedOptionId];
-            const right = MONEY[record.correctOptionId];
+            const chosen = question.options.find((o) => o.id === record.selectedOptionId);
+            const right = question.options.find((o) => o.id === record.correctOptionId);
             return (
               <div className="review-card" key={record.questionId}>
-                <div className="review-item">
-                  <img src={question.item.image} alt={question.item.name} />
-                  <span className="review-price">
-                    The {question.item.name.toLowerCase()} costs{" "}
-                    <strong>{formatMoney(question.item.price)}</strong>
-                  </span>
-                </div>
+                {question.item ? (
+                  <div className="review-item">
+                    {question.item.emoji ? (
+                      <span className="review-emoji">{question.item.emoji}</span>
+                    ) : (
+                      <img src={question.item.image} alt={question.item.name} />
+                    )}
+                    <span className="review-price">
+                      The {question.item.name.toLowerCase()} costs{" "}
+                      <strong>{formatMoney(question.item.price)}</strong>
+                    </span>
+                  </div>
+                ) : (
+                  <p className="review-prompt">{question.prompt}</p>
+                )}
                 <div className="review-answers">
                   <div className="review-answer chosen">
                     <span className="review-answer-label">You chose</span>
-                    <img src={chosen.image} alt={chosen.label} />
-                    <span>{formatMoney(chosen.value)}</span>
+                    {chosen && <OptionVisual option={chosen} />}
                   </div>
                   <span className="review-arrow" aria-hidden="true">➡️</span>
                   <div className="review-answer right">
                     <span className="review-answer-label">Correct answer</span>
-                    <img src={right.image} alt={right.label} />
-                    <span>{formatMoney(right.value)}</span>
+                    {right && <OptionVisual option={right} />}
                   </div>
                 </div>
               </div>

@@ -6,6 +6,7 @@ import { formatMoney } from "../data/currency";
 import { StarBar } from "../components/StarBar";
 import { StreakBadge } from "../components/StreakBadge";
 import { BirdMascot, type MascotState } from "../components/mascot/BirdMascot";
+import { OptionVisual, optionTypeClass } from "../components/OptionVisual";
 import { sounds } from "../audio/sound";
 import { prefersReducedMotion } from "../motion";
 
@@ -184,16 +185,28 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
             exit={{ x: -120, opacity: 0 }}
             transition={{ type: "spring", bounce: 0.3, duration: 0.5 }}
           >
-            <div className="shop-shelf">
-              <motion.img
-                className="item-image"
-                src={question.item.image}
-                alt={question.item.name}
-                animate={reducedMotion ? undefined : { y: [0, -6, 0] }}
-                transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut" }}
-              />
-              <span className="price-tag">{formatMoney(question.item.price)}</span>
-            </div>
+            {question.item && (
+              <div className="shop-shelf">
+                {question.item.emoji ? (
+                  <motion.span
+                    className="item-image item-emoji"
+                    animate={reducedMotion ? undefined : { y: [0, -6, 0] }}
+                    transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut" }}
+                  >
+                    {question.item.emoji}
+                  </motion.span>
+                ) : (
+                  <motion.img
+                    className="item-image"
+                    src={question.item.image}
+                    alt={question.item.name}
+                    animate={reducedMotion ? undefined : { y: [0, -6, 0] }}
+                    transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut" }}
+                  />
+                )}
+                <span className="price-tag">{formatMoney(question.item.price)}</span>
+              </div>
+            )}
             <h2 className="question-prompt">{question.prompt}</h2>
 
             <div className="options-row">
@@ -210,7 +223,7 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
                   <motion.button
                     key={option.id}
                     type="button"
-                    className={`money-option note ${feedbackClass}`}
+                    className={`money-option ${optionTypeClass(option)} ${feedbackClass}`}
                     disabled={showFeedback}
                     whileTap={phase === "answering" ? { scale: 0.92 } : undefined}
                     animate={
@@ -227,8 +240,7 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
                     {(feedbackClass === "correct" || feedbackClass === "reveal") && (
                       <span className="option-check" aria-hidden="true">✓</span>
                     )}
-                    <img src={option.image} alt={option.label} />
-                    <span className="money-value">{formatMoney(option.value)}</span>
+                    <OptionVisual option={option} />
                   </motion.button>
                 );
               })}

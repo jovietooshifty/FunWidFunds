@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import type { AnswerRecord, Level, MoneyOption } from "../types";
 import { formatMoney, minBills } from "../data/currency";
@@ -227,13 +227,11 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
           />
         </div>
 
-        <AnimatePresence mode="wait">
           <motion.div
             key={question.id}
             className="question-area"
             initial={{ x: 120, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -120, opacity: 0 }}
             transition={{ type: "spring", bounce: 0.3, duration: 0.5 }}
           >
             {question.item && (
@@ -306,7 +304,6 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
             </div>
             )}
           </motion.div>
-        </AnimatePresence>
       </div>
 
       {flyingStar && (

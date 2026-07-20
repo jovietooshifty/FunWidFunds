@@ -645,6 +645,7 @@ button {
 }
 
 .dropped-bill {
+  position: relative;
   border: none;
   background: none;
   padding: 0;
@@ -657,6 +658,42 @@ button {
   width: auto;
   border-radius: 4px;
   box-shadow: 0 2px 0 rgba(74, 53, 32, 0.18);
+}
+
+.remove-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--coral);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 22px;
+  text-align: center;
+  box-shadow: 0 1px 0 rgba(74, 53, 32, 0.3);
+}
+
+.start-over {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ocean);
+  background: none;
+  border: 2px solid var(--sand);
+  border-radius: 10px;
+  padding: 2px 10px;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.pay-tip {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #8b7355;
+  margin-top: -6px;
 }
 
 .pay-total {

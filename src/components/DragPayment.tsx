@@ -69,6 +69,12 @@ export function DragPayment({
     commit(dropped.filter((b) => b.instanceId !== instanceId));
   }
 
+  function clearAll() {
+    if (disabled) return;
+    sounds.click();
+    commit([]);
+  }
+
   return (
     <div className="pay-area">
       <div className="payment-tray" ref={dropRef}>
@@ -85,9 +91,10 @@ export function DragPayment({
               whileTap={{ scale: 0.85 }}
               onClick={() => remove(b.instanceId)}
               aria-label={`Remove ${MONEY[b.id].label}`}
-              title="Tap to remove"
+              title="Tap to send this bill back"
             >
               <img src={MONEY[b.id].image} alt="" />
+              <span className="remove-badge" aria-hidden="true">✕</span>
             </motion.button>
           ))
         )}
@@ -95,7 +102,18 @@ export function DragPayment({
 
       <div className="pay-total" aria-live="polite">
         You have <strong>${total}</strong> so far
+        {dropped.length > 0 && (
+          <>
+            {" "}
+            <button type="button" className="start-over" onClick={clearAll} disabled={disabled}>
+              ↺ Start over
+            </button>
+          </>
+        )}
       </div>
+      {dropped.length > 0 && (
+        <p className="pay-tip">Tap a bill above to send it back 👆</p>
+      )}
 
       <div className="bill-tray">
         {availableBills.map((id) => (

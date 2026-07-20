@@ -15,15 +15,41 @@ const rep = (id: string, n: number): string[] => Array.from({ length: n }, () =>
 // Bills offered in the draggable tray (a real spread, not just what's needed).
 const TRAY = [N1, N5, N10, N20];
 
-// Type 1 — Exact Match (Fruit Stand): drag bills until the total = price.
-function payQ(num: number, itemName: string, itemImage: string, price: number): Question {
+// Type 1 — Exact Match (Fruit Stand): tap one of three single bills.
+// Kept as the gentle tap intro; drag-to-pay begins at the shops after it.
+function q(
+  num: number,
+  itemName: string,
+  itemImage: string,
+  price: number,
+  optionIds: [string, string, string],
+  correctOptionId: string,
+): Question {
   return {
     id: `level-1-question-${num}`,
-    prompt: `The ${itemName.toLowerCase()} costs $${price}. Drag the money to pay!`,
+    prompt: `The ${itemName.toLowerCase()} costs $${price}. What do you pay with?`,
     item: { name: itemName, price, image: itemImage },
-    mode: "exact",
+    options: optionIds.map((id) => MONEY[id]),
+    correctOptionId,
+  };
+}
+
+// Type 3 — Making Change (Mini-Mart): drag the correct change back to the customer.
+function changeQ(
+  id: string,
+  name: string,
+  emoji: string,
+  price: number,
+  paid: number,
+  change: number,
+): Question {
+  return {
+    id,
+    prompt: `The ${name} costs $${price}. You paid with a $${paid} bill. Drag the change to give back!`,
+    item: { name, price, emoji },
+    mode: "change",
     availableBills: TRAY,
-    targetValue: price,
+    targetValue: change,
   };
 }
 
@@ -80,16 +106,26 @@ function billsQ(
 // Level 1 — Fruit Stand (Exact Match) — unchanged
 // ============================================================
 export const levelOneQuestions: Question[] = [
-  payQ(1, "Apple", "/assets/items/apple.svg", 1),
-  payQ(2, "Juice", "/assets/items/juice.svg", 5),
-  payQ(3, "Orange", "/assets/items/orange.svg", 1),
-  payQ(4, "Mango", "/assets/items/mango.svg", 5),
-  payQ(5, "Pear", "/assets/items/pear.svg", 1),
-  payQ(6, "Pineapple", "/assets/items/pineapple.svg", 10),
-  payQ(7, "Coconut", "/assets/items/coconut.svg", 10),
-  payQ(8, "Banana", "/assets/items/banana.svg", 1),
-  payQ(9, "Grapes", "/assets/items/grapes.svg", 20),
-  payQ(10, "Watermelon", "/assets/items/watermelon.svg", 20),
+  q(1, "Apple", "/assets/items/apple.svg", 1,
+    ["tt-1-dollar-note", "tt-5-dollar-note", "tt-10-dollar-note"], "tt-1-dollar-note"),
+  q(2, "Juice", "/assets/items/juice.svg", 5,
+    ["tt-1-dollar-note", "tt-5-dollar-note", "tt-20-dollar-note"], "tt-5-dollar-note"),
+  q(3, "Orange", "/assets/items/orange.svg", 1,
+    ["tt-10-dollar-note", "tt-1-dollar-note", "tt-5-dollar-note"], "tt-1-dollar-note"),
+  q(4, "Mango", "/assets/items/mango.svg", 5,
+    ["tt-5-dollar-note", "tt-10-dollar-note", "tt-1-dollar-note"], "tt-5-dollar-note"),
+  q(5, "Pear", "/assets/items/pear.svg", 1,
+    ["tt-20-dollar-note", "tt-1-dollar-note", "tt-10-dollar-note"], "tt-1-dollar-note"),
+  q(6, "Pineapple", "/assets/items/pineapple.svg", 10,
+    ["tt-10-dollar-note", "tt-20-dollar-note", "tt-5-dollar-note"], "tt-10-dollar-note"),
+  q(7, "Coconut", "/assets/items/coconut.svg", 10,
+    ["tt-1-dollar-note", "tt-10-dollar-note", "tt-20-dollar-note"], "tt-10-dollar-note"),
+  q(8, "Banana", "/assets/items/banana.svg", 1,
+    ["tt-5-dollar-note", "tt-1-dollar-note", "tt-20-dollar-note"], "tt-1-dollar-note"),
+  q(9, "Grapes", "/assets/items/grapes.svg", 20,
+    ["tt-5-dollar-note", "tt-10-dollar-note", "tt-20-dollar-note"], "tt-20-dollar-note"),
+  q(10, "Watermelon", "/assets/items/watermelon.svg", 20,
+    ["tt-20-dollar-note", "tt-1-dollar-note", "tt-10-dollar-note"], "tt-20-dollar-note"),
 ];
 
 // ============================================================
@@ -112,16 +148,11 @@ export const canteenQuestions: Question[] = [
 // Level 3 — Mini-Mart (Making Change)
 // ============================================================
 export const minimartQuestions: Question[] = [
-  amountQ("change-1", "The toy costs $8. You give a $10 bill. How much change should you get?",
-    [2, 8, 18], 2, { name: "toy", price: 8, emoji: "🧸" }),
-  amountQ("change-2", "The book costs $15. You give a $20 bill. How much change?",
-    [5, 35, 15], 5, { name: "book", price: 15, emoji: "📚" }),
-  amountQ("change-3", "The candy costs $1. You give a $5 bill. How much change?",
-    [4, 6, 5], 4, { name: "candy", price: 1, emoji: "🍬" }),
-  amountQ("change-4", "The juice costs $9. You give a $10 bill. How much change?",
-    [1, 19, 9], 1, { name: "juice", price: 9, emoji: "🧃" }),
-  amountQ("change-5", "The ball costs $16. You give a $20 bill. How much change?",
-    [4, 36, 16], 4, { name: "ball", price: 16, emoji: "⚽" }),
+  changeQ("change-1", "toy", "🧸", 8, 10, 2),
+  changeQ("change-2", "book", "📚", 15, 20, 5),
+  changeQ("change-3", "candy", "🍬", 1, 5, 4),
+  changeQ("change-4", "juice", "🧃", 9, 10, 1),
+  changeQ("change-5", "ball", "⚽", 16, 20, 4),
 ];
 
 // ============================================================

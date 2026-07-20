@@ -492,8 +492,8 @@ button {
   }
 
   .money-option img {
-    width: 100%;
-    max-width: 210px;
+    width: 84%;
+    max-width: 184px;
     height: auto;
   }
 }

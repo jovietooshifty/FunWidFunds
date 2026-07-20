@@ -12,14 +12,17 @@ const LOCKED_MESSAGE = "More shops will unlock soon!";
 interface LevelSelectScreenProps {
   playerName: string;
   character: Character;
+  levels?: Level[];
   onPlayLevel: (level: Level) => void;
 }
 
 export function LevelSelectScreen({
   playerName,
   character,
+  levels: levelsProp,
   onPlayLevel,
 }: LevelSelectScreenProps) {
+  const levels = levelsProp ?? LEVELS;
   const [comingSoonId, setComingSoonId] = useState<number | null>(null);
   const [guideState, setGuideState] = useState<MascotState>("idle");
   const [guideMessage, setGuideMessage] = useState(MAP_MESSAGE);
@@ -77,7 +80,7 @@ export function LevelSelectScreen({
         </div>
 
         <div className="level-map">
-          {LEVELS.map((level, i) => (
+          {levels.map((level, i) => (
             <motion.button
               key={level.id}
               type="button"

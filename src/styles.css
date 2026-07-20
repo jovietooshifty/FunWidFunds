@@ -660,22 +660,6 @@ button {
   box-shadow: 0 2px 0 rgba(74, 53, 32, 0.18);
 }
 
-.remove-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--coral);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 800;
-  line-height: 22px;
-  text-align: center;
-  box-shadow: 0 1px 0 rgba(74, 53, 32, 0.3);
-}
-
 .start-over {
   font-family: inherit;
   font-size: 0.85rem;

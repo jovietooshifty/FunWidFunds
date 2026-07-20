@@ -94,7 +94,6 @@ export function DragPayment({
               title="Tap to send this bill back"
             >
               <img src={MONEY[b.id].image} alt="" />
-              <span className="remove-badge" aria-hidden="true">✕</span>
             </motion.button>
           ))
         )}

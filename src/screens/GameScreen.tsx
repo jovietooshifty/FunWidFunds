@@ -4,6 +4,7 @@ import confetti from "canvas-confetti";
 import type { AnswerRecord, Level, MoneyOption } from "../types";
 import { formatMoney, minBills } from "../data/currency";
 import { DragPayment, type PayResult } from "../components/DragPayment";
+import { DragBudget } from "../components/DragBudget";
 import { StarBar } from "../components/StarBar";
 import { StreakBadge } from "../components/StreakBadge";
 import { BirdMascot, type MascotState } from "../components/mascot/BirdMascot";
@@ -169,12 +170,14 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
     );
   }
 
-  // Drag model: the child built an amount by dragging bills; check it here.
+  // Drag model: the child built an amount by dragging bills/items; check here.
   function handleConfirm(result: PayResult) {
     if (phase !== "answering") return;
     const target = question.targetValue ?? 0;
     let correct = result.total === target;
-    if (question.mode === "least-bills") {
+    if (question.mode === "budget") {
+      correct = result.count === (question.buyCount ?? 0) && result.total <= (question.budget ?? 0);
+    } else if (question.mode === "least-bills") {
       const fewest = minBills(target, question.availableBills ?? []);
       correct = result.total === target && result.count === fewest;
     }
@@ -182,7 +185,7 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
       {
         questionId: question.id,
         selectedOptionId: `paid:${result.total}:${result.count}`,
-        correctOptionId: `need:${target}`,
+        correctOptionId: `need:${question.mode === "budget" ? (question.budget ?? 0) : target}`,
         correct,
         starEarned: correct,
       },
@@ -257,7 +260,16 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
             )}
             <h2 className="question-prompt">{question.prompt}</h2>
 
-            {question.mode ? (
+            {question.mode === "budget" ? (
+              <DragBudget
+                key={question.id}
+                shopItems={question.shopItems ?? []}
+                budget={question.budget ?? 0}
+                buyCount={question.buyCount ?? 1}
+                disabled={phase !== "answering"}
+                onConfirm={handleConfirm}
+              />
+            ) : question.mode ? (
               <DragPayment
                 key={question.id}
                 availableBills={question.availableBills ?? []}

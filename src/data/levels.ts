@@ -76,19 +76,22 @@ function leastBillsQ(id: string, name: string, emoji: string, price: number): Qu
   };
 }
 
-// Type 4 — Budgeting. Options are text choices (items/combos/yes-no).
-function choiceQ(
+// Type 4 — Budgeting (School Canteen): drag items into a cart within budget.
+function budgetQ(
   id: string,
+  budget: number,
+  buyCount: number,
   prompt: string,
-  choices: { label: string; value?: number }[],
-  correctIndex: number,
+  items: { name: string; emoji: string; price: number }[],
 ): Question {
-  const options = choices.map((c, i) => ({
-    id: `${id}-o${i}`,
-    value: c.value ?? 0,
-    label: c.label,
-  }));
-  return { id, prompt, options, correctOptionId: options[correctIndex].id };
+  return {
+    id,
+    prompt,
+    mode: "budget",
+    budget,
+    buyCount,
+    shopItems: items.map((it, i) => ({ id: `${id}-i${i}`, ...it })),
+  };
 }
 
 // ============================================================
@@ -121,16 +124,16 @@ export const levelOneQuestions: Question[] = [
 // Level 2 — School Canteen (Budgeting on a fixed amount)
 // ============================================================
 export const canteenQuestions: Question[] = [
-  choiceQ("budget-1", "You have $15 to spend at the canteen. Which lunch can you afford?",
-    [{ label: "Sandwich $12", value: 12 }, { label: "Pizza slice $18", value: 18 }, { label: "Combo meal $20", value: 20 }], 0),
-  choiceQ("budget-2", "You have $10. Can you buy the juice for $4 and the sandwich for $5?",
-    [{ label: "Yes, $9 total", value: 9 }, { label: "No, too much", value: 0 }, { label: "Yes, exactly $10", value: 10 }], 0),
-  choiceQ("budget-3", "You have $20. Which toy fits your budget?",
-    [{ label: "Puzzle $14", value: 14 }, { label: "Robot $25", value: 25 }, { label: "Bike $40", value: 40 }], 0),
-  choiceQ("budget-4", "You have $12. Pick two snacks that add up to $12 or less.",
-    [{ label: "Chips $6 + Juice $5", value: 11 }, { label: "Chips $6 + Cookie $8", value: 14 }, { label: "Juice $5 + Cookie $8", value: 13 }], 0),
-  choiceQ("budget-5", "You have $25. Which is the better deal within budget?",
-    [{ label: "Puzzle $18", value: 18 }, { label: "Game $30", value: 30 }], 0),
+  budgetQ("budget-1", 15, 1, "You have $15. Drag 1 lunch you can afford into your cart!",
+    [{ name: "Sandwich", emoji: "🥪", price: 12 }, { name: "Pizza", emoji: "🍕", price: 18 }, { name: "Combo", emoji: "🍱", price: 20 }]),
+  budgetQ("budget-2", 10, 2, "You have $10. Drag 2 snacks that fit your budget!",
+    [{ name: "Juice", emoji: "🧃", price: 4 }, { name: "Sandwich", emoji: "🥪", price: 5 }, { name: "Cookie", emoji: "🍪", price: 8 }]),
+  budgetQ("budget-3", 20, 1, "You have $20. Drag 1 toy that fits your budget!",
+    [{ name: "Puzzle", emoji: "🧩", price: 14 }, { name: "Robot", emoji: "🤖", price: 25 }, { name: "Bike", emoji: "🚲", price: 40 }]),
+  budgetQ("budget-4", 12, 2, "You have $12. Drag 2 snacks without going over!",
+    [{ name: "Chips", emoji: "🍟", price: 6 }, { name: "Juice", emoji: "🧃", price: 5 }, { name: "Cookie", emoji: "🍪", price: 8 }]),
+  budgetQ("budget-5", 25, 1, "You have $25. Drag the better deal that fits your budget!",
+    [{ name: "Puzzle", emoji: "🧩", price: 18 }, { name: "Game", emoji: "🎮", price: 30 }]),
 ];
 
 // ============================================================

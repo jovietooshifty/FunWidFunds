@@ -728,6 +728,124 @@ button {
   margin-top: 2px;
 }
 
+/* ---- Budgeting: drag items into a cart ---- */
+.budget-bar {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 700;
+}
+
+.budget-chip {
+  background: var(--sand);
+  border-radius: 12px;
+  padding: 4px 12px;
+  color: var(--ink);
+}
+
+.cart-chip {
+  background: rgba(53, 183, 104, 0.15);
+  color: #2a8c4a;
+  border-radius: 12px;
+  padding: 4px 12px;
+}
+
+.cart-chip.over {
+  background: rgba(255, 123, 84, 0.18);
+  color: #c04020;
+}
+
+.pick-count {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #8b7355;
+}
+
+.cart-tray {
+  border-color: var(--leaf);
+  background: rgba(53, 183, 104, 0.06);
+}
+
+.cart-tray.over {
+  border-color: var(--coral);
+  background: rgba(255, 123, 84, 0.08);
+}
+
+.cart-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: var(--panel);
+  border: 2px solid var(--sand);
+  border-radius: 14px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.cart-item-emoji {
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  line-height: 1;
+}
+
+.cart-item-price {
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.shop-shelf-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 620px;
+}
+
+.shop-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 92px;
+  background: var(--panel);
+  border: 3px solid var(--sand);
+  border-radius: 16px;
+  padding: 10px 8px 8px;
+  box-shadow: var(--shadow);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.shop-item:active {
+  cursor: grabbing;
+}
+
+.shop-item.in-cart {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+
+.shop-item-emoji {
+  font-size: clamp(2rem, 7vw, 2.8rem);
+  line-height: 1;
+}
+
+.shop-item-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.shop-item-price {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--leaf);
+}
+
 .money-option:not(:disabled):hover {
   border-color: var(--sunshine);
 }

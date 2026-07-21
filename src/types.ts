@@ -15,6 +15,13 @@ export interface QuestionItem {
 
 export type PaymentMode = "exact" | "change" | "least-bills" | "budget";
 
+export interface ShopItem {
+  id: string;
+  name: string;
+  emoji: string;
+  price: number;
+}
+
 export interface Question {
   id: string;
   prompt: string;
@@ -26,6 +33,10 @@ export interface Question {
   mode?: PaymentMode;
   availableBills?: string[]; // denominations offered in the draggable tray
   targetValue?: number; // amount the kid must reach (price, or change owed)
+  // Budgeting (drag items into a cart) model:
+  budget?: number; // spending limit
+  shopItems?: ShopItem[]; // items available on the shelf
+  buyCount?: number; // how many items must end up in the cart
 }
 
 export interface Level {

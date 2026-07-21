@@ -2174,6 +2174,27 @@ button:focus-visible,
   margin-bottom: 1.2rem;
 }
 
+.leaderboard-screen .lb-back {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 3;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  background: rgba(255, 253, 245, 0.92);
+  border: 2px solid var(--sand);
+  border-radius: 12px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  color: var(--ink);
+  backdrop-filter: blur(6px);
+}
+
+.leaderboard-screen .lb-back:hover {
+  background: var(--panel);
+}
+
 .leaderboard-tabs {
   display: flex;
   justify-content: center;

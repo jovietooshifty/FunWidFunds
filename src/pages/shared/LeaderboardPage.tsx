@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLeaderboard, type LeaderboardEntry } from "../../hooks/useLeaderboard";
@@ -73,6 +74,7 @@ function LeaderboardTable({ entries }: { entries: LeaderboardEntry[] }) {
 
 export function LeaderboardPage() {
   const { profile, user } = useAuth();
+  const navigate = useNavigate();
   const [classId, setClassId] = useState<string | undefined>();
   const [tab, setTab] = useState<"global" | "class">("global");
   const { global, classBoard, loading } = useLeaderboard(classId);
@@ -116,6 +118,14 @@ export function LeaderboardPage() {
       animate={{ opacity: 1, y: 0 }}
     >
       <AwardDecor />
+
+      <button
+        type="button"
+        className="lb-back"
+        onClick={() => navigate(profile?.role === "teacher" ? "/teacher/dashboard" : "/parent/dashboard")}
+      >
+        ⏪ Back
+      </button>
 
       <motion.div
         className="lb-banner"

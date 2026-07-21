@@ -6,7 +6,7 @@ import { sounds } from "../audio/sound";
 import { BirdMascot, type MascotState } from "../components/mascot/BirdMascot";
 import { prefersReducedMotion } from "../motion";
 
-const MAP_MESSAGE = "Welcome to Money Town! Let's start at the Fruit Stand!";
+const MAP_MESSAGE = "Welcome to FunWidFunds! Let's start at the Fruit Stand!";
 const LOCKED_MESSAGE = "More shops will unlock soon!";
 
 interface LevelSelectScreenProps {
@@ -65,7 +65,7 @@ export function LevelSelectScreen({
           <span className="player-chip-emoji">{character.emoji}</span>
           {playerName}
         </span>
-        <h1 className="screen-title">Money Town Map</h1>
+        <h1 className="screen-title">FunWidFunds Map</h1>
         <p className="screen-subtitle">Where are we shopping today?</p>
       </header>
 

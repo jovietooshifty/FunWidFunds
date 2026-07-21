@@ -1,4 +1,4 @@
-import type { Level, Question, QuestionItem } from "../types";
+import type { Level, Question } from "../types";
 import { MONEY } from "./currency";
 
 // ---- Bill id shorthands (dollar notes only for now) ----
@@ -6,7 +6,6 @@ const N1 = "tt-1-dollar-note";
 const N5 = "tt-5-dollar-note";
 const N10 = "tt-10-dollar-note";
 const N20 = "tt-20-dollar-note";
-const rep = (id: string, n: number): string[] => Array.from({ length: n }, () => id);
 
 // ============================================================
 // Helpers — one per question shape. All produce a Question.
@@ -53,21 +52,28 @@ function changeQ(
   };
 }
 
-// Types 2 & 3 — Counting / Making Change. Options are plain dollar amounts.
-function amountQ(
-  id: string,
-  prompt: string,
-  amounts: number[],
-  correctValue: number,
-  item?: QuestionItem,
-): Question {
-  const options = amounts.map((v, i) => ({
-    id: `${id}-o${i}`,
-    value: v,
-    label: `$${v}`,
-  }));
-  const correct = options.find((o) => o.value === correctValue)!;
-  return { id, prompt, item, options, correctOptionId: correct.id };
+// Counting (Toy Shop): drag bills to build exactly the price.
+function exactPayQ(id: string, name: string, emoji: string, price: number): Question {
+  return {
+    id,
+    prompt: `The ${name} costs $${price}. Drag money to pay exactly $${price}!`,
+    item: { name, price, emoji },
+    mode: "exact",
+    availableBills: TRAY,
+    targetValue: price,
+  };
+}
+
+// Least Bills (Toy Shop): reach the price using the fewest bills possible.
+function leastBillsQ(id: string, name: string, emoji: string, price: number): Question {
+  return {
+    id,
+    prompt: `The ${name} costs $${price}. Pay with the fewest bills you can!`,
+    item: { name, price, emoji },
+    mode: "least-bills",
+    availableBills: TRAY,
+    targetValue: price,
+  };
 }
 
 // Type 4 — Budgeting. Options are text choices (items/combos/yes-no).
@@ -83,23 +89,6 @@ function choiceQ(
     label: c.label,
   }));
   return { id, prompt, options, correctOptionId: options[correctIndex].id };
-}
-
-// Type 5 — Least Bills. Options are combinations of real bills.
-function billsQ(
-  id: string,
-  prompt: string,
-  item: QuestionItem,
-  combos: { bills: string[]; label: string }[],
-  correctIndex: number,
-): Question {
-  const options = combos.map((c, i) => ({
-    id: `${id}-o${i}`,
-    value: c.bills.reduce((sum, b) => sum + MONEY[b].value, 0),
-    label: c.label,
-    bills: c.bills,
-  }));
-  return { id, prompt, item, options, correctOptionId: options[correctIndex].id };
 }
 
 // ============================================================
@@ -159,24 +148,19 @@ export const minimartQuestions: Question[] = [
 // Level 4 — Toy Shop (Counting + Least Bills, mixed)
 // ============================================================
 const countingQuestions: Question[] = [
-  amountQ("count-1", "You have these bills: $10, $5, and $1. How much money do you have?", [16, 15, 6], 16),
-  amountQ("count-2", "You have $20, $1, and $1. How much money do you have?", [22, 21, 20], 22),
-  amountQ("count-3", "You have $5, $5, and $10. How much money do you have?", [20, 15, 10], 20),
-  amountQ("count-4", "You have $1, $1, $1, and $10. How much money do you have?", [13, 12, 11], 13),
-  amountQ("count-5", "You have $20, $10, $5, and $1. How much money do you have?", [36, 35, 26], 36),
+  exactPayQ("count-1", "toy car", "🚗", 7),
+  exactPayQ("count-2", "doll", "🪆", 12),
+  exactPayQ("count-3", "blocks", "🧱", 8),
+  exactPayQ("count-4", "yo-yo", "🪀", 9),
+  exactPayQ("count-5", "teddy bear", "🧸", 6),
 ];
 
 const leastBillsQuestions: Question[] = [
-  billsQ("bills-1", "The book costs $21. Pay using the fewest bills possible.", { name: "book", price: 21, emoji: "📚" },
-    [{ bills: [N10, N10, N1], label: "two $10 + one $1" }, { bills: rep(N1, 21), label: "21 × $1" }, { bills: [N10, ...rep(N1, 11)], label: "one $10 + eleven $1" }], 0),
-  billsQ("bills-2", "The shoes cost $35. Pay with the fewest bills.", { name: "shoes", price: 35, emoji: "👟" },
-    [{ bills: [N20, N10, N5], label: "one $20 + one $10 + one $5" }, { bills: rep(N5, 7), label: "seven $5" }, { bills: [N10, N10, N10, N5], label: "three $10 + one $5" }], 0),
-  billsQ("bills-3", "The bag costs $16. Pay with the fewest bills.", { name: "bag", price: 16, emoji: "🎒" },
-    [{ bills: [N10, N5, N1], label: "one $10 + one $5 + one $1" }, { bills: [N10, ...rep(N1, 6)], label: "one $10 + six $1" }, { bills: [N5, N5, N5, N1], label: "three $5 + one $1" }], 0),
-  billsQ("bills-4", "The kite costs $42. Pay with the fewest bills.", { name: "kite", price: 42, emoji: "🪁" },
-    [{ bills: [N20, N20, N1, N1], label: "two $20 + two $1" }, { bills: [N10, N10, N10, N10, N1, N1], label: "four $10 + two $1" }, { bills: [N20, N10, N10, N1, N1], label: "one $20 + two $10 + two $1" }], 0),
-  billsQ("bills-5", "The lamp costs $27. Pay with the fewest bills.", { name: "lamp", price: 27, emoji: "💡" },
-    [{ bills: [N20, N5, N1, N1], label: "one $20 + one $5 + two $1" }, { bills: [N10, N10, N5, N1, N1], label: "two $10 + one $5 + two $1" }, { bills: [N20, ...rep(N1, 7)], label: "one $20 + seven $1" }], 0),
+  leastBillsQ("bills-1", "book", "📚", 21),
+  leastBillsQ("bills-2", "shoes", "👟", 35),
+  leastBillsQ("bills-3", "bag", "🎒", 16),
+  leastBillsQ("bills-4", "kite", "🪁", 42),
+  leastBillsQ("bills-5", "lamp", "💡", 27),
 ];
 
 // Mixed: alternate a counting question with a least-bills question.

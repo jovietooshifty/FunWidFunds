@@ -121,8 +121,10 @@ export function StudentGamePage() {
         type="button"
         className="back-to-dashboard-button"
         onClick={() => navigate("/parent/dashboard")}
+        aria-label="Back to dashboard"
+        title="Back to dashboard"
       >
-        Back to Dashboard
+        ⏪
       </button>
     </div>
   );

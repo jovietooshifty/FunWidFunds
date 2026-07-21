@@ -359,9 +359,9 @@ button {
 .game-screen {
   width: min(100%, 1080px);
   gap: 10px;
-  /* clearance so the Submit button never sits under the fixed
-     "Back to Dashboard" button pinned to the bottom-left */
-  padding-bottom: 5.5rem;
+  /* small clearance below the last control; the back-to-dashboard button is
+     now a small bottom-left square that a centred Submit button clears */
+  padding-bottom: 1.5rem;
 }
 
 .game-header {
@@ -1943,13 +1943,17 @@ button:focus-visible,
   position: fixed;
   bottom: 1rem;
   left: 1rem;
-  font-family: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  background: rgba(255, 253, 245, 0.9);
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  line-height: 1;
+  padding: 0;
+  background: rgba(255, 253, 245, 0.92);
   border: 2px solid var(--sand);
-  border-radius: 12px;
-  padding: 0.5rem 1rem;
+  border-radius: 14px;
   cursor: pointer;
   color: var(--ink);
   z-index: 20;
@@ -2268,6 +2272,6 @@ button:focus-visible,
   }
 
   .game-screen {
-    padding-bottom: 4.5rem;
+    padding-bottom: 1rem;
   }
 }

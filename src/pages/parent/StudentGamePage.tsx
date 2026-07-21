@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AnimatePresence } from "framer-motion";
 import { supabase } from "../../lib/supabase";
 import { useProgress } from "../../hooks/useProgress";
 import { useReadAloud } from "../../hooks/useReadAloud";
@@ -80,7 +79,6 @@ export function StudentGamePage() {
     <div className="app-shell" ref={shellRef}>
       <FloatingDecor />
       <ReadAloudToggle enabled={readAloud} onToggle={toggleReadAloud} />
-      <AnimatePresence mode="wait">
         {phase === "levels" && (
           <LevelSelectScreen
             key="levels"
@@ -118,7 +116,6 @@ export function StudentGamePage() {
             onBackToLevels={() => setPhase("levels")}
           />
         )}
-      </AnimatePresence>
 
       <button
         type="button"

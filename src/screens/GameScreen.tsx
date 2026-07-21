@@ -195,7 +195,6 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
       className="screen game-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
     >
       <header className="game-header">
         <button type="button" className="quit-button" onClick={onQuit} aria-label="Back to level map">

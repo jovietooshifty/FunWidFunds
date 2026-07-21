@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
 import type { AnswerRecord, Character, Level, Screen } from "./types";
 import { FloatingDecor } from "./components/FloatingDecor";
 import { WelcomeScreen } from "./screens/WelcomeScreen";
@@ -19,7 +18,6 @@ export default function App() {
   return (
     <div className="app-shell">
       <FloatingDecor />
-      <AnimatePresence mode="wait">
         {screen === "welcome" && (
           <WelcomeScreen
             key="welcome"
@@ -70,7 +68,6 @@ export default function App() {
             onBackToLevels={() => setScreen("levels")}
           />
         )}
-      </AnimatePresence>
     </div>
   );
 }

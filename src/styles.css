@@ -2111,15 +2111,74 @@ button:focus-visible,
 /* ============ LEADERBOARD ============ */
 
 .leaderboard-screen {
+  position: relative;
   max-width: 600px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem 3rem;
+  overflow: hidden;
+}
+
+/* Award decorations floating behind the board */
+.award-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.award-decor-item {
+  position: absolute;
+  opacity: 0.28;
+  filter: saturate(1.1);
+  transform: translate(-50%, -50%);
+}
+
+/* Everything else sits above the decor */
+.leaderboard-screen > *:not(.award-decor) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Award banner / ribbon */
+.lb-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0 auto 0.4rem;
+  padding: 0.5rem 1.6rem;
+  width: fit-content;
+  background: linear-gradient(180deg, var(--sunshine) 0%, var(--coral) 100%);
+  border: 3px solid #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 0 rgba(74, 53, 32, 0.2);
+}
+
+.lb-banner-title {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(74, 53, 32, 0.25);
+  letter-spacing: 0.5px;
+}
+
+.lb-banner-trophy {
+  font-size: clamp(1.4rem, 5vw, 1.9rem);
+  line-height: 1;
+}
+
+.lb-subtitle {
+  text-align: center;
+  font-weight: 600;
+  color: #6b5335;
+  margin-bottom: 1.2rem;
 }
 
 .leaderboard-tabs {
   display: flex;
+  justify-content: center;
   gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.2rem;
 }
 
 .lb-tab {
@@ -2153,22 +2212,27 @@ button:focus-visible,
   padding: 0.6rem 0.8rem;
   background: var(--panel);
   border: 2px solid var(--sand);
-  border-radius: 12px;
+  border-radius: 14px;
+  box-shadow: 0 3px 0 rgba(74, 53, 32, 0.08);
 }
 
 .leaderboard-row.medal-gold {
-  border-color: #ffd700;
-  background: rgba(255, 215, 0, 0.08);
+  border-color: #f5c518;
+  background: linear-gradient(180deg, #fff7d6 0%, #ffe9a8 100%);
+  box-shadow: 0 4px 0 rgba(197, 154, 0, 0.35);
+  padding: 0.8rem;
 }
 
 .leaderboard-row.medal-silver {
-  border-color: #c0c0c0;
-  background: rgba(192, 192, 192, 0.06);
+  border-color: #b9c2cc;
+  background: linear-gradient(180deg, #fbfdff 0%, #e6ecf2 100%);
+  box-shadow: 0 4px 0 rgba(150, 160, 170, 0.3);
 }
 
 .leaderboard-row.medal-bronze {
-  border-color: #cd7f32;
-  background: rgba(205, 127, 50, 0.06);
+  border-color: #d89b5c;
+  background: linear-gradient(180deg, #fff1e2 0%, #f4d7bb 100%);
+  box-shadow: 0 4px 0 rgba(180, 120, 70, 0.3);
 }
 
 .lb-rank {
@@ -2179,18 +2243,44 @@ button:focus-visible,
 }
 
 .lb-emoji {
-  font-size: 1.4rem;
+  position: relative;
+  font-size: 1.5rem;
+}
+
+.lb-crown {
+  position: absolute;
+  top: -0.85rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(-8deg);
+  font-size: 1rem;
 }
 
 .lb-name {
   flex: 1;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .lb-stars {
-  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.95rem;
   color: #8b7355;
   white-space: nowrap;
+}
+
+.lb-stars-icons {
+  letter-spacing: -1px;
+}
+
+.lb-stars-num {
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--sand);
+  border-radius: 10px;
+  padding: 1px 8px;
+  min-width: 1.8rem;
+  text-align: center;
 }
 
 /* ============ READ-ALOUD TOGGLE ============ */

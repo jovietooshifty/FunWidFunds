@@ -35,7 +35,7 @@ interface DroppedBill {
 export function DragPayment({
   availableBills,
   disabled,
-  confirmLabel = "Pay! 💰",
+  confirmLabel = "Submit ✅",
   onConfirm,
   onTotalChange,
 }: DragPaymentProps) {

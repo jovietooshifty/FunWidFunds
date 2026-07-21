@@ -359,6 +359,9 @@ button {
 .game-screen {
   width: min(100%, 1080px);
   gap: 10px;
+  /* clearance so the Submit button never sits under the fixed
+     "Back to Dashboard" button pinned to the bottom-left */
+  padding-bottom: 5.5rem;
 }
 
 .game-header {
@@ -2210,4 +2213,61 @@ button:focus-visible,
 
 .read-aloud-toggle:hover {
   background: var(--panel);
+}
+
+/* ============ COMPACT DRAG LAYOUT ON SMALL SCREENS ============ */
+/* Keeps the whole drag-to-pay flow inside a phone viewport so the page
+   doesn't scroll mid-drag (which made drops land in the wrong place). */
+@media (max-width: 640px) {
+  .question-area {
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  .shop-shelf {
+    padding: 8px 22px;
+  }
+
+  .item-image {
+    width: clamp(60px, 16vw, 88px);
+    height: clamp(60px, 16vw, 88px);
+  }
+
+  .item-emoji {
+    font-size: clamp(44px, 12vw, 64px);
+  }
+
+  .question-prompt {
+    font-size: 1.1rem;
+  }
+
+  .pay-area {
+    gap: 8px;
+  }
+
+  .payment-tray {
+    min-height: 74px;
+    padding: 8px;
+  }
+
+  .payment-tray .dropped-bill img {
+    height: 40px;
+  }
+
+  .bill-tray {
+    gap: 8px;
+    padding: 8px 6px;
+  }
+
+  .tray-bill {
+    height: 44px;
+  }
+
+  .pay-tip {
+    margin-top: -4px;
+  }
+
+  .game-screen {
+    padding-bottom: 4.5rem;
+  }
 }

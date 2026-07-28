@@ -11,7 +11,6 @@ import { InGameLeaderboard } from "../../components/InGameLeaderboard";
 import { sounds } from "../../audio/sound";
 import { LevelSelectScreen } from "../../screens/LevelSelectScreen";
 import { GameScreen } from "../../screens/GameScreen";
-import { CoinCountScreen } from "../../screens/CoinCountScreen";
 import { ResultsScreen } from "../../screens/ResultsScreen";
 import type { Student } from "../../types/database";
 import type { AnswerRecord, Level } from "../../types";
@@ -133,22 +132,14 @@ export function StudentGamePage() {
           />
         )}
 
-        {phase === "game" && activeLevel &&
-          (activeLevel.kind === "coin-count" ? (
-            <CoinCountScreen
+        {phase === "game" && activeLevel && (
+          <GameScreen
               key={`game-${runId}`}
               level={activeLevel}
               onComplete={handleComplete}
               onQuit={() => setPhase("levels")}
             />
-          ) : (
-            <GameScreen
-              key={`game-${runId}`}
-              level={activeLevel}
-              onComplete={handleComplete}
-              onQuit={() => setPhase("levels")}
-            />
-          ))}
+        )}
 
         {phase === "results" && activeLevel && (
           <ResultsScreen

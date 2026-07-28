@@ -95,9 +95,11 @@ export function LevelSelectScreen({
               whileTap={{ scale: 0.94 }}
               onClick={() => handleSelect(level)}
               aria-label={
+                // Position, matching the visible "Level N" — ids are internal
+                // and would otherwise be announced as a different number.
                 level.unlocked
-                  ? `Play level ${level.id}: ${level.title}`
-                  : `Level ${level.id}: ${level.title} — locked`
+                  ? `Play level ${i + 1}: ${level.title}`
+                  : `Level ${i + 1}: ${level.title} — locked`
               }
             >
               {/* Numbered by position, not id — ids stay stable for saved progress */}

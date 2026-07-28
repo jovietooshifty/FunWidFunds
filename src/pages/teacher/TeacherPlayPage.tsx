@@ -8,7 +8,6 @@ import { FloatingDecor } from "../../components/FloatingDecor";
 import { ReadAloudToggle } from "../../components/ReadAloudToggle";
 import { LevelSelectScreen } from "../../screens/LevelSelectScreen";
 import { GameScreen } from "../../screens/GameScreen";
-import { CoinCountScreen } from "../../screens/CoinCountScreen";
 import { ResultsScreen } from "../../screens/ResultsScreen";
 import type { AnswerRecord, Level } from "../../types";
 
@@ -50,18 +49,7 @@ export function TeacherPlayPage() {
         />
       )}
 
-      {phase === "game" && activeLevel &&
-        (activeLevel.kind === "coin-count" ? (
-          <CoinCountScreen
-            key={`game-${runId}`}
-            level={activeLevel}
-            onComplete={(records) => {
-              setAnswers(records);
-              setPhase("results");
-            }}
-            onQuit={() => setPhase("levels")}
-          />
-        ) : (
+      {phase === "game" && activeLevel && (
           <GameScreen
             key={`game-${runId}`}
             level={activeLevel}
@@ -71,7 +59,7 @@ export function TeacherPlayPage() {
             }}
             onQuit={() => setPhase("levels")}
           />
-        ))}
+        )}
 
       {phase === "results" && activeLevel && (
         <ResultsScreen

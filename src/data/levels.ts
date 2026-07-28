@@ -169,21 +169,6 @@ const leastBillsQuestions: Question[] = [
 // Mixed: alternate a counting question with a least-bills question.
 export const toyShopQuestions: Question[] = countingQuestions.flatMap((c, i) => [c, leastBillsQuestions[i]]);
 
-// ============================================================
-// Level 6 — Count the Coins (shown second on the map)
-// Rows of real TT coins; drag the matching total onto each row.
-// Chips = the six answers plus two distractors, so elimination doesn't work.
-// ============================================================
-export const coinCountRows = [
-  { id: "coins-1", coins: [10, 10, 10, 25], answer: 55 },
-  { id: "coins-2", coins: [5, 5, 5, 25, 5], answer: 45 },
-  { id: "coins-3", coins: [25, 25, 25, 25], answer: 100 },
-  { id: "coins-4", coins: [10, 10, 10, 10, 25], answer: 65 },
-  { id: "coins-5", coins: [5, 5, 5, 5, 5], answer: 25 },
-  { id: "coins-6", coins: [10, 25, 25, 5, 10], answer: 75 },
-];
-
-const coinChips = [55, 45, 100, 65, 25, 75, 20, 90]; // last two are distractors
 
 // ============================================================
 // Level 7 — Pay With Coins (shown second on the map)
@@ -217,9 +202,7 @@ export const coinPayQuestions: Question[] = [
 
 /** True when a level actually has something to play (questions or coin rows). */
 export function hasContent(level: Level): boolean {
-  return level.kind === "coin-count"
-    ? (level.coinRows?.length ?? 0) > 0
-    : level.questions.length > 0;
+  return level.questions.length > 0;
 }
 
 // ============================================================
@@ -247,20 +230,6 @@ export const LEVELS: Level[] = [
     unlocked: true,
     questions: coinPayQuestions,
     maxStars: coinPayQuestions.length,
-    completionRequirement: 0,
-  },
-  {
-    id: 6,
-    title: "Count the Coins",
-    description: "Add up the coins and drag the total!",
-    emoji: "🪙",
-    theme: "coins",
-    unlocked: true,
-    kind: "coin-count",
-    coinRows: coinCountRows,
-    coinChips,
-    questions: [],
-    maxStars: coinCountRows.length,
     completionRequirement: 0,
   },
   {

@@ -25,11 +25,9 @@ export const router = createBrowserRouter([
   // Public: standalone demo (original game, no auth)
   { path: "/demo", element: <App /> },
 
-  // Public landing page (guests only — signed-in users go to their dashboard)
-  {
-    element: <RequireGuest />,
-    children: [{ path: "/", element: <LandingPage /> }],
-  },
+  // Landing page is the front door: fully public, no guard, no redirect.
+  // Signed-in visitors see it too (e.g. straight after logging out).
+  { path: "/", element: <LandingPage /> },
 
   // Guest-only auth pages
   {

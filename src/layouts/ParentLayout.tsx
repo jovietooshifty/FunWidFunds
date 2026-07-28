@@ -26,7 +26,16 @@ export function ParentLayout() {
           <button
             type="button"
             className="nav-link nav-logout"
-            onClick={() => { sounds.click(); signOut(); }}
+            onClick={async () => {
+              sounds.click();
+              // Navigate to the public landing page BEFORE clearing the session,
+              // otherwise RequireAuth sees the empty session first and bounces
+              // the user to /login. Land them at the top of the page, not in
+              // the demo section further down.
+              navigate("/", { replace: true });
+              window.scrollTo(0, 0);
+              await signOut();
+            }}
           >
             Log out
           </button>

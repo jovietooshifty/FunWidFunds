@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useReadAloud } from "../contexts/ReadAloudContext";
 import { BirdMascot } from "../components/mascot/BirdMascot";
 import { FloatingDecor } from "../components/FloatingDecor";
 import { GameScreen } from "../screens/GameScreen";
@@ -24,7 +25,15 @@ export function LandingPage() {
   const demoRef = useRef<HTMLDivElement>(null);
   const reduced = prefersReducedMotion();
 
+  const { cancel: cancelSpeech } = useReadAloud();
+
   const [rolePicker, setRolePicker] = useState<"signup" | "login" | null>(null);
+  // The demo only mounts the game once the visitor deliberately starts it.
+  // Mounting it up-front made the narrator read Level 1's first question just
+  // for landing on the page — silent on a cold load (browsers block speech
+  // before any interaction) but audible after e.g. visiting /login and hitting
+  // Back, which is exactly the reported bug. Remounting resets this to false.
+  const [playingDemo, setPlayingDemo] = useState(false);
   const [demoDone, setDemoDone] = useState(() => {
     try {
       return localStorage.getItem(DEMO_KEY) === "yes";
@@ -32,6 +41,13 @@ export function LandingPage() {
       return false;
     }
   });
+
+  // Never let speech from elsewhere (or a previous demo run) bleed onto or off
+  // of this page.
+  useEffect(() => {
+    cancelSpeech();
+    return () => cancelSpeech();
+  }, [cancelSpeech]);
 
   function go(kind: "signup" | "login", role: "parent" | "teacher") {
     sounds.click();
@@ -44,6 +60,7 @@ export function LandingPage() {
     } catch {
       /* noop */
     }
+    setPlayingDemo(false);
     setDemoDone(true);
   }
 
@@ -151,7 +168,9 @@ export function LandingPage() {
         <p className="demo-sub">
           {demoDone
             ? "You finished the free demo — make an account to keep playing!"
-            : "Tap the right bill to pay. This one's on us!"}
+            : playingDemo
+              ? "Tap the right bill to pay. This one's on us!"
+              : "One free level, right here in your browser."}
         </p>
 
         {demoDone ? (
@@ -179,14 +198,42 @@ export function LandingPage() {
               I already have an account
             </button>
           </motion.div>
-        ) : (
+        ) : playingDemo ? (
           <div className="demo-frame">
             <GameScreen
               level={LEVELS[0]}
               onComplete={finishDemo}
-              onQuit={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              onQuit={() => {
+                cancelSpeech();
+                setPlayingDemo(false);
+              }}
             />
           </div>
+        ) : (
+          <motion.div
+            className="demo-start-card"
+            initial={{ scale: 0.92, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", bounce: 0.4 }}
+          >
+            <span className="demo-start-emoji" aria-hidden="true">🍎</span>
+            <h3 className="demo-start-title">Fruit Stand</h3>
+            <p className="demo-start-text">
+              Pay for the fruit with the right money. Quarter Action will read
+              each question out to you!
+            </p>
+            <motion.button
+              type="button"
+              className="big-button"
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                sounds.click();
+                setPlayingDemo(true);
+              }}
+            >
+              ▶ Start the demo
+            </motion.button>
+          </motion.div>
         )}
       </section>
 

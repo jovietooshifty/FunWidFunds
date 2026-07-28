@@ -3552,3 +3552,33 @@ button:focus-visible,
     padding: 8px 6px;
   }
 }
+
+/* Demo start card — the game only mounts after this is clicked, so the
+   narrator never speaks just because someone landed on the page. */
+.demo-start-card {
+  width: min(100%, 480px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: center;
+  background: var(--panel);
+  border: 4px solid var(--sunshine);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.6rem 1.2rem;
+}
+
+.demo-start-emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.demo-start-title {
+  font-size: 1.6rem;
+}
+
+.demo-start-text {
+  color: #6b5335;
+  font-weight: 600;
+}

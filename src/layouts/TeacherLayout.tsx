@@ -26,7 +26,14 @@ export function TeacherLayout() {
           <button
             type="button"
             className="nav-link nav-logout"
-            onClick={() => { sounds.click(); signOut(); }}
+            onClick={async () => {
+              sounds.click();
+              // Go to the public landing page before clearing the session, so
+              // RequireAuth can't redirect to /login in the gap.
+              navigate("/", { replace: true });
+              window.scrollTo(0, 0);
+              await signOut();
+            }}
           >
             Log out
           </button>

@@ -10,12 +10,8 @@ import type { MoneyOption } from "../types";
  * future levels but Milestone 1 gameplay is dollar-notes only.
  */
 export const MONEY: Record<string, MoneyOption> = {
-  "tt-1-cent": {
-    id: "tt-1-cent",
-    value: 0.01,
-    label: "One cent coin",
-    image: "/assets/money/tt-1-cent.svg",
-  },
+  // No 1-cent entry: Trinidad & Tobago eliminated the 1c coin and prices round
+  // to the nearest 5c, so it isn't money a child will ever handle.
   // Coin art is the official Central Bank of Trinidad and Tobago photography
   // (value side), masked to a transparent circle.
   "tt-5-cent": {

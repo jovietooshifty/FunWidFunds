@@ -15,6 +15,8 @@ import { JoinClassPage } from "./pages/parent/JoinClassPage";
 import { StudentGamePage } from "./pages/parent/StudentGamePage";
 import { TeacherDashboard } from "./pages/teacher/TeacherDashboard";
 import { CreateClassPage } from "./pages/teacher/CreateClassPage";
+import { ClassDetailPage } from "./pages/teacher/ClassDetailPage";
+import { TeacherPlayPage } from "./pages/teacher/TeacherPlayPage";
 import { LeaderboardPage } from "./pages/shared/LeaderboardPage";
 import App from "./App";
 
@@ -72,8 +74,11 @@ export const router = createBrowserRouter([
             children: [
               { path: "/teacher/dashboard", element: <TeacherDashboard /> },
               { path: "/teacher/create-class", element: <CreateClassPage /> },
+              { path: "/teacher/class/:classId", element: <ClassDetailPage /> },
             ],
           },
+          // Preview mode uses the game shell (no dashboard header)
+          { path: "/teacher/play", element: <TeacherPlayPage /> },
         ],
       },
     ],

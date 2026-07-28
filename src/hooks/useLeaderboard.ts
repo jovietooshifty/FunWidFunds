@@ -8,70 +8,74 @@ export interface LeaderboardEntry {
   total_stars: number;
 }
 
-// Demo champions so the global board feels alive during testing.
-// (Frontend-only — not stored in the database.)
-const DEMO_ENTRIES: LeaderboardEntry[] = [
-  { student_id: "demo-1", name: "Amara", emoji: "🦜", total_stars: 46 },
-  { student_id: "demo-2", name: "Kai", emoji: "🐢", total_stars: 41 },
-  { student_id: "demo-3", name: "Sofia", emoji: "🐠", total_stars: 37 },
-  { student_id: "demo-4", name: "Diego", emoji: "🦩", total_stars: 33 },
-  { student_id: "demo-5", name: "Priya", emoji: "🐵", total_stars: 28 },
-  { student_id: "demo-6", name: "Leo", emoji: "🦀", total_stars: 24 },
-  { student_id: "demo-7", name: "Maya", emoji: "🦜", total_stars: 19 },
-  { student_id: "demo-8", name: "Noah", emoji: "🐢", total_stars: 16 },
-  { student_id: "demo-9", name: "Zoe", emoji: "🐠", total_stars: 13 },
-  { student_id: "demo-10", name: "Omar", emoji: "🦩", total_stars: 11 },
-  { student_id: "demo-11", name: "Isla", emoji: "🐵", total_stars: 9 },
-  { student_id: "demo-12", name: "Ethan", emoji: "🦀", total_stars: 6 },
-  { student_id: "demo-13", name: "Ruby", emoji: "🦜", total_stars: 4 },
-  { student_id: "demo-14", name: "Mason", emoji: "🐢", total_stars: 2 },
-];
+export interface ChildClass {
+  student_id: string;
+  student_name: string;
+  class_id: string;
+  class_name: string;
+}
 
-export function useLeaderboard(classId?: string) {
-  const [global, setGlobal] = useState<LeaderboardEntry[]>([]);
-  const [classBoard, setClassBoard] = useState<LeaderboardEntry[]>([]);
+/** Country-wide board (all players), via a SECURITY DEFINER aggregate. */
+export function useCountryLeaderboard() {
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetch = useCallback(async () => {
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase.rpc("country_leaderboard", { p_limit: 100 });
+      if (!active) return;
+      setEntries(data ?? []);
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return { entries, loading };
+}
+
+/** Board for a single class (teacher of it, or a parent with a child in it). */
+export function useClassLeaderboard(classId: string | undefined) {
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchBoard = useCallback(async () => {
+    if (!classId) {
+      setEntries([]);
+      return;
+    }
     setLoading(true);
-
-    // Global leaderboard: all students ranked by total stars
-    const { data: students } = await supabase.from("students").select("id, name, emoji");
-    const { data: progress } = await supabase.from("student_level_progress").select("student_id, stars_earned");
-
-    const starMap: Record<string, number> = {};
-    for (const p of progress ?? []) {
-      starMap[p.student_id] = (starMap[p.student_id] ?? 0) + p.stars_earned;
-    }
-
-    const realEntries: LeaderboardEntry[] = (students ?? []).map((s) => ({
-      student_id: s.id,
-      name: s.name.split(" ")[0], // first name only for privacy
-      emoji: s.emoji,
-      total_stars: starMap[s.id] ?? 0,
-    }));
-
-    // Blend real players with the demo champions, then rank everyone together.
-    const globalEntries = [...realEntries, ...DEMO_ENTRIES].sort(
-      (a, b) => b.total_stars - a.total_stars,
-    );
-
-    setGlobal(globalEntries);
-
-    // Class leaderboard
-    if (classId) {
-      const { data: links } = await supabase
-        .from("student_class_links")
-        .select("student_id")
-        .eq("class_id", classId);
-      const classIds = new Set((links ?? []).map((l) => l.student_id));
-      setClassBoard(globalEntries.filter((e) => classIds.has(e.student_id)));
-    }
-
+    const { data } = await supabase.rpc("class_leaderboard", { p_class_id: classId });
+    setEntries(data ?? []);
     setLoading(false);
   }, [classId]);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetchBoard();
+  }, [fetchBoard]);
 
-  return { global, classBoard, loading };
+  return { entries, loading };
+}
+
+/** The signed-in parent's children and the class each belongs to (for filtering). */
+export function useMyChildrenClasses() {
+  const [options, setOptions] = useState<ChildClass[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase.rpc("my_children_classes");
+      if (!active) return;
+      setOptions(data ?? []);
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return { options, loading };
 }

@@ -1868,8 +1868,12 @@ button:focus-visible,
 
 .student-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.2rem;
+  /* width:100% matters — the dashboard is a centred flex column, so without it
+     the grid shrink-wraps to a single track and reads as one tall column. */
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 1.1rem;
+  align-items: start;
 }
 
 .student-card {
@@ -2096,6 +2100,11 @@ button:focus-visible,
     grid-template-columns: repeat(2, 1fr);
   }
 
+}
+
+/* Learner cards: side-by-side wherever there's room, stacking only on the
+   narrowest phones (they were reading as one tall column before). */
+@media (max-width: 430px) {
   .student-grid {
     grid-template-columns: 1fr;
   }
@@ -2162,6 +2171,7 @@ button:focus-visible,
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .teacher-student-row {
@@ -2502,5 +2512,380 @@ button:focus-visible,
 
   .game-screen {
     padding-bottom: 1rem;
+  }
+}
+
+/* ============ TEACHER: CLASSES & CLASS DETAIL ============ */
+
+.teacher-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.secondary-button {
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--panel);
+  border: 3px solid var(--sunshine);
+  border-radius: 18px;
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(74, 53, 32, 0.15);
+}
+
+.secondary-button:hover {
+  background: #fffdf0;
+}
+
+.empty-emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.section-heading {
+  font-size: 1.3rem;
+  margin: 1.4rem 0 0.7rem;
+}
+
+/* Class cards */
+.class-grid {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+  gap: 1.1rem;
+  align-items: start;
+}
+
+.class-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--panel);
+  border: 3px solid var(--sand);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem 0.9rem;
+}
+
+.class-card-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  background: none;
+  border: none;
+  font-family: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  padding: 0;
+}
+
+.class-card-emoji {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.class-card-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.class-card-meta {
+  font-size: 0.9rem;
+  color: #8b7355;
+  font-weight: 600;
+}
+
+.class-card-code {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--ocean);
+  background: rgba(39, 147, 209, 0.1);
+  border-radius: 10px;
+  padding: 2px 10px;
+}
+
+.class-card-open {
+  margin-top: 0.3rem;
+  font-weight: 800;
+  color: var(--leaf);
+  font-size: 0.95rem;
+}
+
+/* Destructive actions (two-step) */
+.danger-link {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 0.25rem 0.6rem;
+  color: var(--coral);
+  cursor: pointer;
+}
+
+.danger-link:hover {
+  border-color: var(--coral);
+}
+
+.danger-link.armed {
+  background: var(--coral);
+  color: #fff;
+  border-color: var(--coral);
+}
+
+/* Student cards inside a class */
+.teacher-student-card {
+  background: var(--panel);
+  border: 2px solid var(--sand);
+  border-radius: 16px;
+  box-shadow: 0 3px 0 rgba(74, 53, 32, 0.08);
+  overflow: hidden;
+}
+
+.teacher-student-card .teacher-student-row {
+  border: none;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  margin: 0;
+}
+
+.teacher-student-card.rank-1 {
+  border-color: #f5c518;
+  background: linear-gradient(180deg, #fff7d6 0%, #fffdf5 70%);
+}
+
+.teacher-student-card.rank-2 {
+  border-color: #b9c2cc;
+}
+
+.teacher-student-card.rank-3 {
+  border-color: #d89b5c;
+}
+
+.student-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+/* Expandable per-student report */
+.student-report {
+  border-top: 2px dashed var(--sand);
+  padding: 0.8rem 1rem 1rem;
+}
+
+.report-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+
+.report-stat {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #8b7355;
+  background: var(--sand);
+  border-radius: 10px;
+  padding: 3px 10px;
+}
+
+.report-stat strong {
+  color: var(--ink);
+}
+
+.report-heading {
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.report-empty {
+  font-size: 0.9rem;
+  color: #8b7355;
+}
+
+.report-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.report-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 123, 84, 0.07);
+  border-left: 4px solid var(--coral);
+  border-radius: 8px;
+  padding: 0.4rem 0.6rem;
+}
+
+.report-prompt {
+  flex: 1;
+  font-size: 0.88rem;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.report-wrong {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #c04020;
+  white-space: nowrap;
+}
+
+/* Teacher preview badge */
+.preview-badge {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(255, 253, 245, 0.92);
+  border: 2px solid var(--sunshine);
+  border-radius: 12px;
+  padding: 0.35rem 0.7rem;
+  color: var(--ink);
+  z-index: 20;
+  backdrop-filter: blur(6px);
+}
+
+@media (max-width: 600px) {
+  .class-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-row-actions {
+    margin-left: 0;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .preview-badge {
+    display: none;
+  }
+}
+
+/* ============ LEADERBOARD: FILTER, YOU-TAG, IN-GAME OVERLAY ============ */
+
+.lb-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.lb-filter-label {
+  font-size: 0.9rem;
+  color: #6b5335;
+  white-space: nowrap;
+}
+
+.lb-filter-select {
+  font-size: 0.95rem;
+  padding: 0.45rem 0.7rem;
+  max-width: 100%;
+}
+
+.leaderboard-row.is-you {
+  outline: 3px solid var(--ocean);
+  outline-offset: 1px;
+}
+
+.lb-you-tag {
+  margin-left: 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #fff;
+  background: var(--ocean);
+  border-radius: 8px;
+  padding: 1px 7px;
+  vertical-align: middle;
+}
+
+/* Student-facing "View Leaderboard" button on the level map */
+.view-leaderboard-button {
+  position: relative;
+  z-index: 2;
+  margin: -0.5rem auto 2rem;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--panel);
+  border: 3px solid var(--sunshine);
+  border-radius: 999px;
+  padding: 0.6rem 1.6rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(74, 53, 32, 0.18);
+}
+
+.view-leaderboard-button:hover {
+  background: #fffdf0;
+}
+
+/* In-game overlay */
+.lb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(24, 60, 78, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.lb-overlay-card {
+  position: relative;
+  overflow: hidden;
+  width: min(100%, 540px);
+  max-height: min(88vh, 760px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  background: linear-gradient(180deg, #d6f1fb 0%, var(--panel) 45%);
+  border: 4px solid var(--sunshine);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 0 rgba(74, 53, 32, 0.25);
+  padding: 1.2rem 1rem 1.4rem;
+}
+
+.lb-overlay-card > *:not(.award-decor) {
+  position: relative;
+  z-index: 1;
+}
+
+.lb-overlay-scroll {
+  width: 100%;
+  overflow-y: auto;
+  padding: 0 0.2rem 0.4rem;
+}
+
+@media (max-width: 520px) {
+  .lb-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lb-overlay-card {
+    padding: 1rem 0.7rem 1.1rem;
   }
 }

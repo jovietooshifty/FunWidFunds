@@ -125,6 +125,44 @@ export type Database = {
           },
         ];
       };
+      student_answers: {
+        Row: {
+          id: string;
+          student_id: string;
+          level_id: number;
+          question_id: string;
+          prompt: string | null;
+          correct: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          student_id: string;
+          level_id: number;
+          question_id: string;
+          prompt?: string | null;
+          correct: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          student_id?: string;
+          level_id?: number;
+          question_id?: string;
+          prompt?: string | null;
+          correct?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "student_answers_student_id_fkey";
+            columns: ["student_id"];
+            isOneToOne: false;
+            referencedRelation: "students";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       student_level_progress: {
         Row: {
           id: string;
@@ -180,6 +218,35 @@ export type Database = {
           teacher_name: string;
         }[];
       };
+      // Cross-user leaderboards (definer functions — RLS limits direct reads to
+      // your own students, so aggregates have to be computed server-side).
+      country_leaderboard: {
+        Args: { p_limit?: number };
+        Returns: {
+          student_id: string;
+          name: string;
+          emoji: string;
+          total_stars: number;
+        }[];
+      };
+      class_leaderboard: {
+        Args: { p_class_id: string };
+        Returns: {
+          student_id: string;
+          name: string;
+          emoji: string;
+          total_stars: number;
+        }[];
+      };
+      my_children_classes: {
+        Args: Record<string, never>;
+        Returns: {
+          student_id: string;
+          student_name: string;
+          class_id: string;
+          class_name: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
@@ -192,3 +259,4 @@ export type Student = Database["public"]["Tables"]["students"]["Row"];
 export type Class = Database["public"]["Tables"]["classes"]["Row"];
 export type StudentClassLink = Database["public"]["Tables"]["student_class_links"]["Row"];
 export type StudentLevelProgress = Database["public"]["Tables"]["student_level_progress"]["Row"];
+export type StudentAnswerRow = Database["public"]["Tables"]["student_answers"]["Row"];

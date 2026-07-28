@@ -7,6 +7,8 @@ import { LEVELS } from "../../data/levels";
 import { CHARACTERS } from "../../data/characters";
 import { FloatingDecor } from "../../components/FloatingDecor";
 import { ReadAloudToggle } from "../../components/ReadAloudToggle";
+import { InGameLeaderboard } from "../../components/InGameLeaderboard";
+import { sounds } from "../../audio/sound";
 import { LevelSelectScreen } from "../../screens/LevelSelectScreen";
 import { GameScreen } from "../../screens/GameScreen";
 import { ResultsScreen } from "../../screens/ResultsScreen";
@@ -25,6 +27,8 @@ export function StudentGamePage() {
   const [activeLevel, setActiveLevel] = useState<Level | null>(null);
   const [answers, setAnswers] = useState<AnswerRecord[]>([]);
   const [runId, setRunId] = useState(0);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [classId, setClassId] = useState<string | undefined>();
 
   // Fetch student record
   useEffect(() => {
@@ -35,6 +39,17 @@ export function StudentGamePage() {
       .eq("id", studentId)
       .single()
       .then(({ data }) => setStudent(data));
+  }, [studentId]);
+
+  // Which class this student belongs to (for the in-game class leaderboard)
+  useEffect(() => {
+    if (!studentId) return;
+    supabase
+      .from("student_class_links")
+      .select("class_id")
+      .eq("student_id", studentId)
+      .limit(1)
+      .then(({ data }) => setClassId(data?.[0]?.class_id));
   }, [studentId]);
 
   if (!student) return null;
@@ -60,6 +75,21 @@ export function StudentGamePage() {
       const correct = records.filter((r) => r.correct).length;
       const wrong = records.filter((r) => !r.correct).length;
       await upsertProgress(activeLevel.id, correct, correct + wrong, wrong);
+
+      // Per-question log powers the teacher's "trickiest questions" report.
+      const rows = records.map((r) => ({
+        student_id: studentId,
+        level_id: activeLevel.id,
+        question_id: r.questionId,
+        prompt: activeLevel.questions.find((q) => q.id === r.questionId)?.prompt ?? null,
+        correct: r.correct,
+      }));
+      if (rows.length > 0) {
+        // Non-blocking: analytics must never break finishing a level.
+        supabase.from("student_answers").insert(rows).then(({ error }) => {
+          if (error) console.warn("Could not record answers:", error.message);
+        });
+      }
     }
   }
 
@@ -67,18 +97,39 @@ export function StudentGamePage() {
     <div className="app-shell">
       <FloatingDecor />
       <ReadAloudToggle enabled={readAloud} onToggle={toggleReadAloud} />
+
+      {showLeaderboard && studentId && (
+        <InGameLeaderboard
+          studentId={studentId}
+          classId={classId}
+          onClose={() => setShowLeaderboard(false)}
+        />
+      )}
+
         {phase === "levels" && (
-          <LevelSelectScreen
-            key="levels"
-            playerName={student.name}
-            character={character}
-            levels={levelsWithUnlock}
-            onPlayLevel={(level) => {
-              setActiveLevel(level);
-              setRunId((r) => r + 1);
-              setPhase("game");
-            }}
-          />
+          <>
+            <LevelSelectScreen
+              key="levels"
+              playerName={student.name}
+              character={character}
+              levels={levelsWithUnlock}
+              onPlayLevel={(level) => {
+                setActiveLevel(level);
+                setRunId((r) => r + 1);
+                setPhase("game");
+              }}
+            />
+            <button
+              type="button"
+              className="view-leaderboard-button"
+              onClick={() => {
+                sounds.click();
+                setShowLeaderboard(true);
+              }}
+            >
+              🏆 View Leaderboard
+            </button>
+          </>
         )}
 
         {phase === "game" && activeLevel && (

@@ -2,114 +2,48 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
-import { useLeaderboard, type LeaderboardEntry } from "../../hooks/useLeaderboard";
+import {
+  useCountryLeaderboard,
+  useClassLeaderboard,
+  useMyChildrenClasses,
+} from "../../hooks/useLeaderboard";
+import { AwardDecor, LeaderboardPanel } from "../../components/LeaderboardPanel";
 import { supabase } from "../../lib/supabase";
-import { prefersReducedMotion } from "../../motion";
-
-const MEDALS = ["", "medal-gold", "medal-silver", "medal-bronze"];
-
-// Award decorations scattered behind the board.
-const DECOR: { e: string; top: string; left: string; size: string; delay: number }[] = [
-  { e: "🏆", top: "8%", left: "6%", size: "2.6rem", delay: 0 },
-  { e: "🏅", top: "18%", left: "88%", size: "2.2rem", delay: 0.4 },
-  { e: "🎖️", top: "42%", left: "4%", size: "2rem", delay: 0.8 },
-  { e: "⭐", top: "58%", left: "92%", size: "1.8rem", delay: 0.2 },
-  { e: "🥇", top: "72%", left: "8%", size: "2.2rem", delay: 0.6 },
-  { e: "🎗️", top: "84%", left: "84%", size: "2rem", delay: 1 },
-  { e: "⭐", top: "30%", left: "94%", size: "1.4rem", delay: 1.2 },
-  { e: "🏆", top: "90%", left: "50%", size: "1.8rem", delay: 0.5 },
-];
-
-function AwardDecor() {
-  const reduced = prefersReducedMotion();
-  return (
-    <div className="award-decor" aria-hidden="true">
-      {DECOR.map((d, i) => (
-        <motion.span
-          key={i}
-          className="award-decor-item"
-          style={{ top: d.top, left: d.left, fontSize: d.size }}
-          animate={reduced ? undefined : { y: [0, -10, 0], rotate: [-4, 4, -4] }}
-          transition={{ repeat: Infinity, duration: 4 + i * 0.3, ease: "easeInOut", delay: d.delay }}
-        >
-          {d.e}
-        </motion.span>
-      ))}
-    </div>
-  );
-}
-
-function LeaderboardTable({ entries }: { entries: LeaderboardEntry[] }) {
-  if (entries.length === 0) {
-    return <p className="dashboard-empty">No scores yet. Start playing!</p>;
-  }
-
-  return (
-    <div className="leaderboard-table">
-      {entries.map((entry, i) => (
-        <motion.div
-          key={entry.student_id}
-          className={`leaderboard-row ${MEDALS[i + 1] ?? ""}`}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: Math.min(i * 0.05, 0.6) }}
-        >
-          <span className="lb-rank">
-            {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`}
-          </span>
-          <span className="lb-emoji">
-            {i === 0 && <span className="lb-crown" aria-hidden="true">👑</span>}
-            {entry.emoji}
-          </span>
-          <span className="lb-name">{entry.name}</span>
-          <span className="lb-stars">
-            <span className="lb-stars-icons">{"⭐".repeat(Math.min(entry.total_stars, 5))}</span>
-            <span className="lb-stars-num">{entry.total_stars}</span>
-          </span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
 
 export function LeaderboardPage() {
   const { profile, user } = useAuth();
   const navigate = useNavigate();
+  const isTeacher = profile?.role === "teacher";
+
+  const [tab, setTab] = useState<"country" | "class">("country");
   const [classId, setClassId] = useState<string | undefined>();
-  const [tab, setTab] = useState<"global" | "class">("global");
-  const { global, classBoard, loading } = useLeaderboard(classId);
 
-  // Find user's class (if teacher, their class; if parent, their students' class)
+  const { entries: country, loading: countryLoading } = useCountryLeaderboard();
+  const { options: childClasses } = useMyChildrenClasses();
+  const { entries: classEntries, loading: classLoading } = useClassLeaderboard(classId);
+
+  // Teachers pick from their own classes; parents pick from their children's.
+  const [teacherClasses, setTeacherClasses] = useState<{ id: string; name: string }[]>([]);
   useEffect(() => {
-    if (!user || !profile) return;
-    if (profile.role === "teacher") {
-      supabase
-        .from("classes")
-        .select("id")
-        .eq("teacher_id", user.id)
-        .limit(1)
-        .single()
-        .then(({ data }) => { if (data) setClassId(data.id); });
-    } else {
-      supabase
-        .from("students")
-        .select("id")
-        .eq("parent_id", user.id)
-        .then(({ data: students }) => {
-          if (!students?.length) return;
-          supabase
-            .from("student_class_links")
-            .select("class_id")
-            .in("student_id", students.map((s) => s.id))
-            .limit(1)
-            .then(({ data: links }) => {
-              if (links?.[0]) setClassId(links[0].class_id);
-            });
-        });
-    }
-  }, [user, profile]);
+    if (!isTeacher || !user) return;
+    supabase
+      .from("classes")
+      .select("id, name")
+      .eq("teacher_id", user.id)
+      .order("created_at")
+      .then(({ data }) => setTeacherClasses(data ?? []));
+  }, [isTeacher, user]);
 
-  if (loading) return null;
+  // Default the class selection once options load.
+  useEffect(() => {
+    if (classId) return;
+    if (isTeacher && teacherClasses.length > 0) setClassId(teacherClasses[0].id);
+    if (!isTeacher && childClasses.length > 0) setClassId(childClasses[0].class_id);
+  }, [classId, isTeacher, teacherClasses, childClasses]);
+
+  const hasClassOption = isTeacher ? teacherClasses.length > 0 : childClasses.length > 0;
+
+  if (countryLoading) return null;
 
   return (
     <motion.div
@@ -122,7 +56,7 @@ export function LeaderboardPage() {
       <button
         type="button"
         className="lb-back"
-        onClick={() => navigate(profile?.role === "teacher" ? "/teacher/dashboard" : "/parent/dashboard")}
+        onClick={() => navigate(isTeacher ? "/teacher/dashboard" : "/parent/dashboard")}
       >
         ⏪ Back
       </button>
@@ -142,23 +76,54 @@ export function LeaderboardPage() {
       <div className="leaderboard-tabs">
         <button
           type="button"
-          className={`lb-tab ${tab === "global" ? "active" : ""}`}
-          onClick={() => setTab("global")}
+          className={`lb-tab ${tab === "country" ? "active" : ""}`}
+          onClick={() => setTab("country")}
         >
-          🌍 Global
+          🇹🇹 Country
         </button>
-        {classId && (
+        {hasClassOption && (
           <button
             type="button"
             className={`lb-tab ${tab === "class" ? "active" : ""}`}
             onClick={() => setTab("class")}
           >
-            🎓 My Class
+            🎓 Class
           </button>
         )}
       </div>
 
-      <LeaderboardTable entries={tab === "global" ? global : classBoard} />
+      {/* Which class? Parents may have children in different classes. */}
+      {tab === "class" && hasClassOption && (
+        <label className="lb-filter">
+          <span className="lb-filter-label">Showing:</span>
+          <select
+            className="auth-input lb-filter-select"
+            value={classId ?? ""}
+            onChange={(e) => setClassId(e.target.value)}
+          >
+            {isTeacher
+              ? teacherClasses.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))
+              : childClasses.map((c) => (
+                  <option key={`${c.student_id}-${c.class_id}`} value={c.class_id}>
+                    {c.student_name}'s class — {c.class_name}
+                  </option>
+                ))}
+          </select>
+        </label>
+      )}
+
+      {tab === "country" ? (
+        <LeaderboardPanel entries={country} />
+      ) : classLoading ? null : (
+        <LeaderboardPanel
+          entries={classEntries}
+          emptyMessage="No one in this class has played yet!"
+        />
+      )}
     </motion.div>
   );
 }

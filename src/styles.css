@@ -494,11 +494,6 @@ button {
     align-items: stretch;
   }
 
-  .money-option img {
-    width: 88%;
-    max-width: 158px;
-    height: auto;
-  }
 }
 
 .money-option {
@@ -516,9 +511,16 @@ button {
 }
 
 .money-option img {
-  height: clamp(64px, 14vw, 96px);
+  /* Bounded on BOTH axes so a note can never spill past its card: max-width is
+     relative to the card's content box, so the padding above stays visible as
+     an even margin. (A previous desktop-only override lived in a media query
+     ABOVE this rule and was silently overridden — media queries add no
+     specificity, so the later rule won and notes rendered 210px wide inside
+     173px cards.) */
   width: auto;
-  max-width: min(46vw, 210px);
+  height: auto;
+  max-width: 100%;
+  max-height: clamp(56px, 12vw, 88px);
   object-fit: contain;
 }
 
@@ -1562,7 +1564,10 @@ button:focus-visible,
   }
 
   .money-option {
+    /* Cap the basis so a third option alone on the last row doesn't grow to
+       full width and dwarf the two above it. */
     flex: 1 1 40%;
+    max-width: calc(50% - 5px);
   }
 
   .streak-label {

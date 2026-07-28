@@ -318,7 +318,7 @@ button {
 }
 
 .level-number {
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   font-weight: 800;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -335,17 +335,18 @@ button {
 }
 
 .level-title {
-  font-size: clamp(1.2rem, 3.6vw, 1.5rem);
+  font-size: clamp(1.45rem, 4.2vw, 1.85rem);
   font-weight: 800;
 }
 
 .level-desc {
-  font-size: 0.95rem;
-  opacity: 0.75;
+  font-size: 1.12rem;
+  opacity: 0.8;
   min-height: 2.4em;
 }
 
 .level-go {
+  font-size: 1.1rem;
   font-weight: 800;
   color: #fff;
   background: var(--leaf);

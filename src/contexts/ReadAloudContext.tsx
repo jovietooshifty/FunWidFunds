@@ -65,6 +65,26 @@ export function ReadAloudProvider({ children }: { children: ReactNode }) {
     return () => speechSynthesis.cancel();
   }, [supported]);
 
+  // Chrome suspends speech in a backgrounded tab and resumes it on return, so a
+  // line queued while the child was elsewhere would suddenly play when they came
+  // back — speech "starting on its own". Drop anything pending the moment the
+  // page is hidden or unloaded.
+  useEffect(() => {
+    if (!supported) return;
+    const stop = () => speechSynthesis.cancel();
+    const onVisibility = () => {
+      if (document.hidden) stop();
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", stop);
+    window.addEventListener("blur", onVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", stop);
+      window.removeEventListener("blur", onVisibility);
+    };
+  }, [supported]);
+
   const cancel = useCallback(() => {
     if (!supported) return;
     speechSynthesis.cancel();
@@ -73,6 +93,8 @@ export function ReadAloudProvider({ children }: { children: ReactNode }) {
   const speak = useCallback(
     (text: string) => {
       if (!supported || !enabledRef.current || !text) return;
+      // Don't queue anything for a tab nobody is looking at.
+      if (typeof document !== "undefined" && document.hidden) return;
       speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.85;

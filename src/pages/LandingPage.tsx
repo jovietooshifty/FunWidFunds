@@ -95,7 +95,7 @@ export function LandingPage() {
         >
           <BirdMascot
             state="idle"
-            message="Hi! I'm Quarter Action!"
+            message="Welcome to FunWidFunds!"
             size="large"
             reducedMotion={reduced}
           />
@@ -133,7 +133,7 @@ export function LandingPage() {
                 demoRef.current?.scrollIntoView({ behavior: "smooth" });
               }}
             >
-              🎮 Try it free
+              🎮 Try now
             </motion.button>
           </div>
 

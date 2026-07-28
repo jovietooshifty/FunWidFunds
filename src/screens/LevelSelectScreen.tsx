@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { LEVELS } from "../data/levels";
 import type { Character, Level } from "../types";
@@ -13,6 +13,8 @@ interface LevelSelectScreenProps {
   playerName: string;
   character: Character;
   levels?: Level[];
+  /** Optional control shown at the top of the map (e.g. View Leaderboard). */
+  headerAction?: ReactNode;
   onPlayLevel: (level: Level) => void;
 }
 
@@ -20,6 +22,7 @@ export function LevelSelectScreen({
   playerName,
   character,
   levels: levelsProp,
+  headerAction,
   onPlayLevel,
 }: LevelSelectScreenProps) {
   const levels = levelsProp ?? LEVELS;
@@ -67,6 +70,7 @@ export function LevelSelectScreen({
         </span>
         <h1 className="screen-title">FunWidFunds Map</h1>
         <p className="screen-subtitle">Where are we shopping today?</p>
+        {headerAction}
       </header>
 
       <div className="guide-layout">

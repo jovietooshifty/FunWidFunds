@@ -2822,7 +2822,7 @@ button:focus-visible,
 .view-leaderboard-button {
   position: relative;
   z-index: 2;
-  margin: -0.5rem auto 2rem;
+  margin: 0.4rem auto 0;
   font-family: inherit;
   font-size: 1.05rem;
   font-weight: 800;

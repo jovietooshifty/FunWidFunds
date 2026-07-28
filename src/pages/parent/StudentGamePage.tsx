@@ -107,29 +107,29 @@ export function StudentGamePage() {
       )}
 
         {phase === "levels" && (
-          <>
-            <LevelSelectScreen
-              key="levels"
-              playerName={student.name}
-              character={character}
-              levels={levelsWithUnlock}
-              onPlayLevel={(level) => {
-                setActiveLevel(level);
-                setRunId((r) => r + 1);
-                setPhase("game");
-              }}
-            />
-            <button
-              type="button"
-              className="view-leaderboard-button"
-              onClick={() => {
-                sounds.click();
-                setShowLeaderboard(true);
-              }}
-            >
-              🏆 View Leaderboard
-            </button>
-          </>
+          <LevelSelectScreen
+            key="levels"
+            playerName={student.name}
+            character={character}
+            levels={levelsWithUnlock}
+            headerAction={
+              <button
+                type="button"
+                className="view-leaderboard-button"
+                onClick={() => {
+                  sounds.click();
+                  setShowLeaderboard(true);
+                }}
+              >
+                🏆 View Leaderboard
+              </button>
+            }
+            onPlayLevel={(level) => {
+              setActiveLevel(level);
+              setRunId((r) => r + 1);
+              setPhase("game");
+            }}
+          />
         )}
 
         {phase === "game" && activeLevel && (

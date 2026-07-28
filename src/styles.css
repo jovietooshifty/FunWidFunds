@@ -3256,3 +3256,174 @@ button:focus-visible,
     transform: scale(0.8);
   }
 }
+
+/* ============ LEVEL: COUNT THE COINS ============ */
+
+.coin-screen {
+  gap: 8px;
+}
+
+.coin-prompt {
+  margin-bottom: 0.2rem;
+}
+
+.coin-layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: clamp(8px, 2vw, 24px);
+  width: 100%;
+}
+
+.coin-guide {
+  flex: 0 0 auto;
+  position: sticky;
+  top: 8px;
+}
+
+.coin-rows {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 640px;
+}
+
+.coin-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--panel);
+  border: 3px solid var(--sand);
+  border-radius: 18px;
+  padding: 8px 10px;
+  box-shadow: 0 3px 0 rgba(74, 53, 32, 0.1);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.coin-row.solved {
+  border-color: var(--happy);
+  background: #eaf9ec;
+}
+
+.coin-row.wrong {
+  border-color: var(--gentle);
+  background: #fdf3e7;
+}
+
+.coin-row-coins {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* Real CBTT coin photos, sized to keep the coins' true relative proportions */
+.coin-img {
+  display: block;
+  /* Slight lift: shrinking the photos blends the engraved detail toward grey,
+     so nudge brightness/contrast to keep the bird, hibiscus and chaconia clear. */
+  filter: brightness(1.1) contrast(1.08) drop-shadow(0 2px 1px rgba(74, 53, 32, 0.28));
+  user-select: none;
+  flex: 0 0 auto;
+}
+
+.coin-drop {
+  flex: 0 0 auto;
+  width: clamp(78px, 18vw, 104px);
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed var(--ocean);
+  border-radius: 14px;
+  background: rgba(39, 147, 209, 0.07);
+}
+
+.coin-row.solved .coin-drop {
+  border-style: solid;
+  border-color: var(--happy);
+  background: #ffffff;
+}
+
+.coin-drop-hint {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--ocean);
+  opacity: 0.5;
+}
+
+/* Draggable value chips */
+.chip-pool {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 10px;
+  background: var(--panel);
+  border: 3px solid var(--sunshine);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.chip-pool-label {
+  font-weight: 700;
+  color: #8b7355;
+  font-size: 0.9rem;
+}
+
+.chip-pool-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.coin-chip {
+  font-family: inherit;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(180deg, var(--ocean) 0%, #1d78ad 100%);
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 1.1rem;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  box-shadow: 0 4px 0 rgba(74, 53, 32, 0.22);
+}
+
+.coin-chip:active {
+  cursor: grabbing;
+}
+
+.coin-chip.used {
+  visibility: hidden;
+}
+
+.coin-chip.placed {
+  background: linear-gradient(180deg, var(--leaf) 0%, #2a9455 100%);
+  cursor: default;
+  box-shadow: none;
+  padding: 0.35rem 0.7rem;
+  font-size: clamp(0.9rem, 2.6vw, 1.1rem);
+}
+
+@media (max-width: 700px) {
+  .coin-guide {
+    display: none;
+  }
+
+  .coin-row {
+    padding: 6px 8px;
+    gap: 6px;
+  }
+}

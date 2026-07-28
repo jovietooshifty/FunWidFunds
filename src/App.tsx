@@ -6,6 +6,7 @@ import { useReadAloud } from "./contexts/ReadAloudContext";
 import { WelcomeScreen } from "./screens/WelcomeScreen";
 import { LevelSelectScreen } from "./screens/LevelSelectScreen";
 import { GameScreen } from "./screens/GameScreen";
+import { CoinCountScreen } from "./screens/CoinCountScreen";
 import { ResultsScreen } from "./screens/ResultsScreen";
 
 export default function App() {
@@ -46,17 +47,28 @@ export default function App() {
           />
         )}
 
-        {screen === "game" && character && activeLevel && (
-          <GameScreen
-            key={`game-${runId}`}
-            level={activeLevel}
-            onComplete={(records) => {
-              setAnswers(records);
-              setScreen("results");
-            }}
-            onQuit={() => setScreen("levels")}
-          />
-        )}
+        {screen === "game" && character && activeLevel &&
+          (activeLevel.kind === "coin-count" ? (
+            <CoinCountScreen
+              key={`game-${runId}`}
+              level={activeLevel}
+              onComplete={(records) => {
+                setAnswers(records);
+                setScreen("results");
+              }}
+              onQuit={() => setScreen("levels")}
+            />
+          ) : (
+            <GameScreen
+              key={`game-${runId}`}
+              level={activeLevel}
+              onComplete={(records) => {
+                setAnswers(records);
+                setScreen("results");
+              }}
+              onQuit={() => setScreen("levels")}
+            />
+          ))}
 
         {screen === "results" && character && activeLevel && (
           <ResultsScreen

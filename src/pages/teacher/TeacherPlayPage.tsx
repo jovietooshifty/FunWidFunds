@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LEVELS } from "../../data/levels";
+import { LEVELS, hasContent } from "../../data/levels";
 import { CHARACTERS } from "../../data/characters";
 import { useAuth } from "../../contexts/AuthContext";
 import { useReadAloud } from "../../contexts/ReadAloudContext";
@@ -8,6 +8,7 @@ import { FloatingDecor } from "../../components/FloatingDecor";
 import { ReadAloudToggle } from "../../components/ReadAloudToggle";
 import { LevelSelectScreen } from "../../screens/LevelSelectScreen";
 import { GameScreen } from "../../screens/GameScreen";
+import { CoinCountScreen } from "../../screens/CoinCountScreen";
 import { ResultsScreen } from "../../screens/ResultsScreen";
 import type { AnswerRecord, Level } from "../../types";
 
@@ -28,7 +29,7 @@ export function TeacherPlayPage() {
   const [runId, setRunId] = useState(0);
 
   const character = CHARACTERS[0];
-  const levels = LEVELS.map((l) => ({ ...l, unlocked: l.questions.length > 0 }));
+  const levels = LEVELS.map((l) => ({ ...l, unlocked: hasContent(l) }));
 
   return (
     <div className="app-shell">
@@ -49,17 +50,28 @@ export function TeacherPlayPage() {
         />
       )}
 
-      {phase === "game" && activeLevel && (
-        <GameScreen
-          key={`game-${runId}`}
-          level={activeLevel}
-          onComplete={(records) => {
-            setAnswers(records);
-            setPhase("results");
-          }}
-          onQuit={() => setPhase("levels")}
-        />
-      )}
+      {phase === "game" && activeLevel &&
+        (activeLevel.kind === "coin-count" ? (
+          <CoinCountScreen
+            key={`game-${runId}`}
+            level={activeLevel}
+            onComplete={(records) => {
+              setAnswers(records);
+              setPhase("results");
+            }}
+            onQuit={() => setPhase("levels")}
+          />
+        ) : (
+          <GameScreen
+            key={`game-${runId}`}
+            level={activeLevel}
+            onComplete={(records) => {
+              setAnswers(records);
+              setPhase("results");
+            }}
+            onQuit={() => setPhase("levels")}
+          />
+        ))}
 
       {phase === "results" && activeLevel && (
         <ResultsScreen

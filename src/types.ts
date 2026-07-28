@@ -39,6 +39,13 @@ export interface Question {
   buyCount?: number; // how many items must end up in the cart
 }
 
+/** One row of coins the child must total up (values in cents). */
+export interface CoinRowSpec {
+  id: string;
+  coins: number[];
+  answer: number; // cents
+}
+
 export interface Level {
   id: number;
   title: string;
@@ -49,6 +56,11 @@ export interface Level {
   questions: Question[];
   maxStars: number;
   completionRequirement: number;
+  /** "questions" (default) = one-at-a-time; "coin-count" = drag totals onto rows. */
+  kind?: "questions" | "coin-count";
+  coinRows?: CoinRowSpec[];
+  /** Draggable chip values in cents (answers plus distractors). */
+  coinChips?: number[];
 }
 
 export interface Character {

@@ -16,23 +16,31 @@ export const MONEY: Record<string, MoneyOption> = {
     label: "One cent coin",
     image: "/assets/money/tt-1-cent.svg",
   },
+  // Coin art is the official Central Bank of Trinidad and Tobago photography
+  // (value side), masked to a transparent circle.
   "tt-5-cent": {
     id: "tt-5-cent",
     value: 0.05,
     label: "Five cent coin",
-    image: "/assets/money/tt-5-cent.svg",
+    image: "/assets/money/tt-5-cent.png",
   },
   "tt-10-cent": {
     id: "tt-10-cent",
     value: 0.1,
     label: "Ten cent coin",
-    image: "/assets/money/tt-10-cent.svg",
+    image: "/assets/money/tt-10-cent.png",
   },
   "tt-25-cent": {
     id: "tt-25-cent",
     value: 0.25,
     label: "Twenty-five cent coin",
-    image: "/assets/money/tt-25-cent.svg",
+    image: "/assets/money/tt-25-cent.png",
+  },
+  "tt-50-cent": {
+    id: "tt-50-cent",
+    value: 0.5,
+    label: "Fifty cent coin",
+    image: "/assets/money/tt-50-cent.png",
   },
   "tt-1-dollar-coin": {
     id: "tt-1-dollar-coin",
@@ -75,6 +83,38 @@ export const MONEY: Record<string, MoneyOption> = {
 export function formatMoney(value: number): string {
   return value < 1 ? `${Math.round(value * 100)}¢` : `$${value}`;
 }
+
+/** Format a cent amount the way the worksheets do: 55 -> "55¢", 100 -> "$1.00". */
+export function formatCents(cents: number): string {
+  if (cents < 100) return `${cents}¢`;
+  const dollars = cents / 100;
+  return `$${dollars.toFixed(2)}`;
+}
+
+/** Spoken form for read-aloud: 55 -> "55 cents", 100 -> "1 dollar". */
+export function speakCents(cents: number): string {
+  if (cents < 100) return `${cents} cents`;
+  const dollars = cents / 100;
+  const whole = Math.floor(dollars);
+  const rest = cents % 100;
+  const dollarPart = `${whole} dollar${whole === 1 ? "" : "s"}`;
+  return rest === 0 ? dollarPart : `${dollarPart} and ${rest} cents`;
+}
+
+/**
+ * Coin art + on-screen size for each denomination, in cents.
+ *
+ * Sizes keep the real coins' relative proportions (the 5c really is wider than
+ * the 10c, and the 25c is the biggest) so children learn to tell them apart by
+ * size as well as picture — scaled up from the physical millimetre ratios so
+ * the bird/hibiscus/chaconia stay legible on a tablet.
+ */
+export const COINS: Record<number, { id: string; image: string; label: string; size: number }> = {
+  5: { id: "tt-5-cent", image: "/assets/money/tt-5-cent.png", label: "five cent coin", size: 66 },
+  10: { id: "tt-10-cent", image: "/assets/money/tt-10-cent.png", label: "ten cent coin", size: 62 },
+  25: { id: "tt-25-cent", image: "/assets/money/tt-25-cent.png", label: "twenty-five cent coin", size: 76 },
+  50: { id: "tt-50-cent", image: "/assets/money/tt-50-cent.png", label: "fifty cent coin", size: 81 },
+};
 
 export function isNote(id: string): boolean {
   return id.includes("note");

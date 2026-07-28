@@ -100,7 +100,8 @@ export function LevelSelectScreen({
                   : `Level ${level.id}: ${level.title} — locked`
               }
             >
-              <span className="level-number">Level {level.id}</span>
+              {/* Numbered by position, not id — ids stay stable for saved progress */}
+              <span className="level-number">Level {i + 1}</span>
               <motion.span
                 className="level-emoji"
                 animate={

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useProgress } from "../../hooks/useProgress";
 import { useReadAloud } from "../../contexts/ReadAloudContext";
-import { LEVELS } from "../../data/levels";
+import { LEVELS, hasContent } from "../../data/levels";
 import { CHARACTERS } from "../../data/characters";
 import { FloatingDecor } from "../../components/FloatingDecor";
 import { ReadAloudToggle } from "../../components/ReadAloudToggle";
@@ -11,6 +11,7 @@ import { InGameLeaderboard } from "../../components/InGameLeaderboard";
 import { sounds } from "../../audio/sound";
 import { LevelSelectScreen } from "../../screens/LevelSelectScreen";
 import { GameScreen } from "../../screens/GameScreen";
+import { CoinCountScreen } from "../../screens/CoinCountScreen";
 import { ResultsScreen } from "../../screens/ResultsScreen";
 import type { Student } from "../../types/database";
 import type { AnswerRecord, Level } from "../../types";
@@ -60,7 +61,7 @@ export function StudentGamePage() {
   // Compute unlocked levels from progress
   const levelsWithUnlock = LEVELS.map((level) => {
     // A level with no questions ("coming soon") is never playable.
-    const hasQuestions = level.questions.length > 0;
+    const hasQuestions = hasContent(level);
     if (level.id === 1) return { ...level, unlocked: hasQuestions };
     const prevProgress = progress.find((p) => p.level_id === level.id - 1);
     const progressed = prevProgress ? prevProgress.stars_earned >= prevProgress.level_id : false;
@@ -132,14 +133,22 @@ export function StudentGamePage() {
           />
         )}
 
-        {phase === "game" && activeLevel && (
-          <GameScreen
-            key={`game-${runId}`}
-            level={activeLevel}
-            onComplete={handleComplete}
-            onQuit={() => setPhase("levels")}
-          />
-        )}
+        {phase === "game" && activeLevel &&
+          (activeLevel.kind === "coin-count" ? (
+            <CoinCountScreen
+              key={`game-${runId}`}
+              level={activeLevel}
+              onComplete={handleComplete}
+              onQuit={() => setPhase("levels")}
+            />
+          ) : (
+            <GameScreen
+              key={`game-${runId}`}
+              level={activeLevel}
+              onComplete={handleComplete}
+              onQuit={() => setPhase("levels")}
+            />
+          ))}
 
         {phase === "results" && activeLevel && (
           <ResultsScreen

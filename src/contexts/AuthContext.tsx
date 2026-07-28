@@ -41,24 +41,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
+    let active = true;
+
+    // The profile fetch must finish BEFORE loading flips to false. Otherwise
+    // there's a window where `loading === false` but `profile === null`, and
+    // RequireRole bounces a legitimately signed-in user to /login (which then
+    // forwards them to their dashboard) — breaking refresh and deep links.
+    (async () => {
+      const {
+        data: { session: s },
+      } = await supabase.auth.getSession();
+      if (!active) return;
       setSession(s);
-      if (s?.user) fetchProfile(s.user.id);
+      if (s?.user) await fetchProfile(s.user.id);
+      if (!active) return;
       setLoading(false);
-    });
+    })();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, s) => {
+    } = supabase.auth.onAuthStateChange(async (_event, s) => {
+      if (!active) return;
       setSession(s);
       if (s?.user) {
-        fetchProfile(s.user.id);
+        await fetchProfile(s.user.id);
       } else {
         setProfile(null);
       }
+      if (active) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (email: string, password: string, name: string, role: "parent" | "teacher") => {

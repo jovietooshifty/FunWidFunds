@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
-import type { Class } from "../types/database";
+
+export interface ClassPreview {
+  id: string;
+  name: string;
+  class_code: string;
+  teacher_id: string;
+  teacher_name: string;
+}
 
 export function useClassJoin() {
-  const [previewClass, setPreviewClass] = useState<(Class & { teacher_name: string }) | null>(null);
+  const [previewClass, setPreviewClass] = useState<ClassPreview | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,21 +19,22 @@ export function useClassJoin() {
     setLoading(true);
     setPreviewClass(null);
 
-    const { data, error: err } = await supabase
-      .from("classes")
-      .select("*, profiles!classes_teacher_id_fkey(name)")
-      .eq("class_code", code.toUpperCase())
-      .single();
+    // RPC (SECURITY DEFINER) rather than an embedded join: RLS restricts
+    // `profiles` reads to your own row, so joining here returned a null
+    // teacher and the UI fell back to the literal word "Teacher".
+    const { data, error: err } = await supabase.rpc("lookup_class_by_code", {
+      p_code: code.trim(),
+    });
 
     setLoading(false);
 
-    if (err || !data) {
+    const row = data?.[0];
+    if (err || !row) {
       setError("No class found with that code. Check and try again!");
       return;
     }
 
-    const teacherName = (data as any).profiles?.name ?? "Teacher";
-    setPreviewClass({ ...data, teacher_name: teacherName });
+    setPreviewClass(row);
   };
 
   const joinClass = async (studentId: string, classId: string) => {

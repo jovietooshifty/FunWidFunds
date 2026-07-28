@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useProgress } from "../../hooks/useProgress";
-import { useReadAloud } from "../../hooks/useReadAloud";
+import { useReadAloud } from "../../contexts/ReadAloudContext";
 import { LEVELS } from "../../data/levels";
 import { CHARACTERS } from "../../data/characters";
 import { FloatingDecor } from "../../components/FloatingDecor";
@@ -19,8 +19,7 @@ export function StudentGamePage() {
   const { studentId } = useParams<{ studentId: string }>();
   const navigate = useNavigate();
   const { progress, upsertProgress } = useProgress(studentId);
-  const { enabled: readAloud, toggle: toggleReadAloud, speak } = useReadAloud();
-  const shellRef = useRef<HTMLDivElement>(null);
+  const { enabled: readAloud, toggle: toggleReadAloud } = useReadAloud();
   const [student, setStudent] = useState<Student | null>(null);
   const [phase, setPhase] = useState<GamePhase>("levels");
   const [activeLevel, setActiveLevel] = useState<Level | null>(null);
@@ -37,17 +36,6 @@ export function StudentGamePage() {
       .single()
       .then(({ data }) => setStudent(data));
   }, [studentId]);
-
-  // Read-aloud: observe question prompts via MutationObserver
-  useEffect(() => {
-    if (!shellRef.current) return;
-    const observer = new MutationObserver(() => {
-      const prompt = shellRef.current?.querySelector(".question-prompt");
-      if (prompt?.textContent) speak(prompt.textContent);
-    });
-    observer.observe(shellRef.current, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, [speak]);
 
   if (!student) return null;
 
@@ -76,7 +64,7 @@ export function StudentGamePage() {
   }
 
   return (
-    <div className="app-shell" ref={shellRef}>
+    <div className="app-shell">
       <FloatingDecor />
       <ReadAloudToggle enabled={readAloud} onToggle={toggleReadAloud} />
         {phase === "levels" && (

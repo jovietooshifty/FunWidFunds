@@ -1,12 +1,15 @@
 import { useState } from "react";
 import type { AnswerRecord, Character, Level, Screen } from "./types";
 import { FloatingDecor } from "./components/FloatingDecor";
+import { ReadAloudToggle } from "./components/ReadAloudToggle";
+import { useReadAloud } from "./contexts/ReadAloudContext";
 import { WelcomeScreen } from "./screens/WelcomeScreen";
 import { LevelSelectScreen } from "./screens/LevelSelectScreen";
 import { GameScreen } from "./screens/GameScreen";
 import { ResultsScreen } from "./screens/ResultsScreen";
 
 export default function App() {
+  const { enabled: readAloud, toggle: toggleReadAloud } = useReadAloud();
   const [screen, setScreen] = useState<Screen>("welcome");
   const [playerName, setPlayerName] = useState("");
   const [character, setCharacter] = useState<Character | null>(null);
@@ -18,6 +21,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <FloatingDecor />
+      <ReadAloudToggle enabled={readAloud} onToggle={toggleReadAloud} />
         {screen === "welcome" && (
           <WelcomeScreen
             key="welcome"

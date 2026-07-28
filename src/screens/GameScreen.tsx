@@ -9,6 +9,7 @@ import { StarBar } from "../components/StarBar";
 import { StreakBadge } from "../components/StreakBadge";
 import { BirdMascot, type MascotState } from "../components/mascot/BirdMascot";
 import { OptionVisual, optionTypeClass } from "../components/OptionVisual";
+import { useReadAloud } from "../contexts/ReadAloudContext";
 import { sounds } from "../audio/sound";
 import { prefersReducedMotion } from "../motion";
 
@@ -60,6 +61,7 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
   const [flyingStar, setFlyingStar] = useState<FlyingStar | null>(null);
   const timerRef = useRef<number | null>(null);
   const reducedMotion = prefersReducedMotion();
+  const { speak, cancel: cancelSpeech } = useReadAloud();
 
   const question = level.questions[index];
   const total = level.questions.length;
@@ -71,6 +73,17 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
       if (timerRef.current !== null) window.clearTimeout(timerRef.current);
     };
   }, []);
+
+  // Read the prompt aloud once per question — including the first one on entry.
+  // Driven by the question id (not DOM mutations), so feedback re-renders never
+  // cause a repeat, and `speak` is stable so toggling the voice doesn't re-fire.
+  const promptToRead = question?.prompt;
+  useEffect(() => {
+    if (promptToRead) speak(promptToRead);
+  }, [promptToRead, speak]);
+
+  // Stop talking when leaving the game (quit, or level complete).
+  useEffect(() => () => cancelSpeech(), [cancelSpeech]);
 
   // Defensive: a level with no questions (e.g. a "coming soon" shop) should
   // never crash the game — show a friendly bail-out instead.

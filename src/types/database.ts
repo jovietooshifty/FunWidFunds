@@ -168,7 +168,18 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      // SECURITY DEFINER lookup: lets a parent see a class + its teacher's name
+      // from a class code without opening up `profiles` reads generally.
+      lookup_class_by_code: {
+        Args: { p_code: string };
+        Returns: {
+          id: string;
+          name: string;
+          class_code: string;
+          teacher_id: string;
+          teacher_name: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;

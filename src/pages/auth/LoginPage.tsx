@@ -1,10 +1,14 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/AuthContext";
 
 export function LoginPage() {
   const { signIn } = useAuth();
+  const [params] = useSearchParams();
+  // Carried over from the landing page's role picker — the real role comes from
+  // the saved profile, so this is just a reassuring "you're in the right place".
+  const role = params.get("role") === "teacher" ? "teacher" : params.get("role") === "parent" ? "parent" : null;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +36,11 @@ export function LoginPage() {
     >
       <h2 className="auth-title">Welcome back!</h2>
       <p className="auth-subtitle">Sign in to continue your learning adventure</p>
+      {role && (
+        <p className="auth-role-chip">
+          {role === "teacher" ? "👩‍🏫 Teacher" : "👨‍👧 Parent"} sign in
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="auth-form">
         <label className="auth-label">

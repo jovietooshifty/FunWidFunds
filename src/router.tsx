@@ -18,11 +18,18 @@ import { CreateClassPage } from "./pages/teacher/CreateClassPage";
 import { ClassDetailPage } from "./pages/teacher/ClassDetailPage";
 import { TeacherPlayPage } from "./pages/teacher/TeacherPlayPage";
 import { LeaderboardPage } from "./pages/shared/LeaderboardPage";
+import { LandingPage } from "./pages/LandingPage";
 import App from "./App";
 
 export const router = createBrowserRouter([
   // Public: standalone demo (original game, no auth)
   { path: "/demo", element: <App /> },
+
+  // Public landing page (guests only — signed-in users go to their dashboard)
+  {
+    element: <RequireGuest />,
+    children: [{ path: "/", element: <LandingPage /> }],
+  },
 
   // Guest-only auth pages
   {
@@ -92,7 +99,5 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // Root redirect → login (auth state will bounce to dashboard if logged in)
-  { path: "/", element: <Navigate to="/login" replace /> },
   { path: "*", element: <Navigate to="/login" replace /> },
 ]);

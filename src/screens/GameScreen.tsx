@@ -5,6 +5,7 @@ import type { AnswerRecord, Level, MoneyOption } from "../types";
 import { formatMoney, minBills } from "../data/currency";
 import { DragPayment, type PayResult } from "../components/DragPayment";
 import { DragBudget } from "../components/DragBudget";
+import { CoinPay } from "../components/CoinPay";
 import { StarBar } from "../components/StarBar";
 import { StreakBadge } from "../components/StreakBadge";
 import { BirdMascot, type MascotState } from "../components/mascot/BirdMascot";
@@ -273,7 +274,27 @@ export function GameScreen({ level, onComplete, onQuit }: GameScreenProps) {
             )}
             <h2 className="question-prompt">{question.prompt}</h2>
 
-            {question.mode === "budget" ? (
+            {question.mode === "coin-pay" ? (
+              <CoinPay
+                key={question.id}
+                targetCents={question.targetCents ?? 0}
+                availableCoins={question.availableCoins ?? []}
+                disabled={phase !== "answering"}
+                onSolved={(coinsUsed, rect) => {
+                  if (phase !== "answering") return;
+                  resolveAnswer(
+                    {
+                      questionId: question.id,
+                      selectedOptionId: `coins:${coinsUsed.join("+")}`,
+                      correctOptionId: `cents:${question.targetCents ?? 0}`,
+                      correct: true,
+                      starEarned: true,
+                    },
+                    rect,
+                  );
+                }}
+              />
+            ) : question.mode === "budget" ? (
               <DragBudget
                 key={question.id}
                 shopItems={question.shopItems ?? []}

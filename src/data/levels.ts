@@ -1,5 +1,5 @@
 import type { Level, Question } from "../types";
-import { MONEY } from "./currency";
+import { MONEY, speakCents } from "./currency";
 
 // ---- Bill id shorthands (dollar notes only for now) ----
 const N1 = "tt-1-dollar-note";
@@ -185,6 +185,36 @@ export const coinCountRows = [
 
 const coinChips = [55, 45, 100, 65, 25, 75, 20, 90]; // last two are distractors
 
+// ============================================================
+// Level 7 — Pay With Coins (shown second on the map)
+// One question at a time: drag coins until they total the price exactly.
+// Every pool holds more coins than needed, and several combinations work.
+//
+// Every target is a multiple of 5c: Trinidad & Tobago eliminated the 1c coin
+// and prices round to the nearest 5c, so amounts like 7c can't actually be paid.
+// ============================================================
+function coinPayQ(num: number, targetCents: number, availableCoins: number[]): Question {
+  return {
+    id: `level-2-question-${num}`,
+    // Written out in words so read-aloud says "fifty-five cents", not "55 c".
+    prompt: `Pay exactly ${speakCents(targetCents)}!`,
+    mode: "coin-pay",
+    targetCents,
+    availableCoins,
+  };
+}
+
+export const coinPayQuestions: Question[] = [
+  coinPayQ(1, 25, [5, 5, 10, 25, 10, 5]), // one 25c, or 10+10+5
+  coinPayQ(2, 35, [10, 10, 25, 5, 5, 10]), // 25+10, or 10+10+10+5
+  coinPayQ(3, 50, [25, 25, 10, 10, 5, 5]), // 25+25, or 25+10+10+5
+  coinPayQ(4, 15, [5, 5, 5, 10, 25, 10]), // 10+5, or 5+5+5
+  coinPayQ(5, 20, [5, 5, 5, 5, 10, 10, 25]), // small coins, no single-coin shortcut
+  coinPayQ(6, 65, [25, 25, 10, 10, 5, 5, 50, 10]), // 50+10+5, or 25+25+10+5
+  coinPayQ(7, 80, [25, 25, 25, 10, 5, 5, 10, 50]), // 50+25+5, or 25+25+25+5
+  coinPayQ(8, 100, [25, 25, 25, 25, 10, 10, 50, 5]), // 25x4, or 50+25+25
+];
+
 /** True when a level actually has something to play (questions or coin rows). */
 export function hasContent(level: Level): boolean {
   return level.kind === "coin-count"
@@ -206,9 +236,20 @@ export const LEVELS: Level[] = [
     completionRequirement: 0,
   },
   {
-    // Keeps a stable id (6) so existing students' saved progress, which is keyed
-    // by level_id, keeps pointing at the shop they actually played. The map
-    // numbers levels by position, so this still shows as "Level 2".
+    // Stable ids (not map positions) — saved progress is keyed by level_id, so
+    // renumbering would silently repoint real students' history at other shops.
+    // The map numbers by position, so this shows as "Level 2".
+    id: 7,
+    title: "Pay With Coins",
+    description: "Drag coins to pay the exact price!",
+    emoji: "💰",
+    theme: "coins",
+    unlocked: true,
+    questions: coinPayQuestions,
+    maxStars: coinPayQuestions.length,
+    completionRequirement: 0,
+  },
+  {
     id: 6,
     title: "Count the Coins",
     description: "Add up the coins and drag the total!",

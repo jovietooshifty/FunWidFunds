@@ -13,7 +13,7 @@ export interface QuestionItem {
   emoji?: string; // NEW: render an emoji instead of an image asset
 }
 
-export type PaymentMode = "exact" | "change" | "least-bills" | "budget";
+export type PaymentMode = "exact" | "change" | "least-bills" | "budget" | "coin-pay";
 
 export interface ShopItem {
   id: string;
@@ -33,6 +33,10 @@ export interface Question {
   mode?: PaymentMode;
   availableBills?: string[]; // denominations offered in the draggable tray
   targetValue?: number; // amount the kid must reach (price, or change owed)
+  // Coin-pay mode: build an exact total out of coins (values in cents, so
+  // there's no floating-point drift when adding 5c + 10c + 25c).
+  targetCents?: number;
+  availableCoins?: number[];
   // Budgeting (drag items into a cart) model:
   budget?: number; // spending limit
   shopItems?: ShopItem[]; // items available on the shelf
